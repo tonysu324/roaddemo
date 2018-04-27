@@ -1,0 +1,55 @@
+﻿html, body {
+    font-family: Arial;
+    height: 100%;
+    margin: 0;
+    width: 100%;
+}
+
+.cursor-pointer {
+    cursor: pointer
+}
+
+.fl {
+    float: left;
+}
+
+.nav {
+    margin: 20px 0 0 10px;
+}
+
+.symbol-item {
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+}
+
+.symbol-item .symbol-item-text {
+        margin-left: 10px;
+    }
+
+.symbol-item-svg {
+    width: 60px;
+    border: 1px solid #808080
+}
+
+.display-none {
+    display: none;
+}
+.userSelect {
+    user-select: none;
+}
+.editor-panel {
+    position: relative;
+    padding: 0;
+    display: flex;
+    border: 1px solid #808080;
+    height: 600px
+}
+.nav-panel {
+    flex: 1;
+    border-left: 1px solid #808080;
+    background: #ececec
+}
+.drawing-panel {
+    flex: 9
+}

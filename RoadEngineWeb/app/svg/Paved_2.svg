@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--PAE symbol-->
+<!--Copyright Â© 2017 PAE National Security Solutions LLC. All Rights Reserved.-->
+<svg diagramVersion="5" id="ttn-svgroot" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-338.02 -122.02 676.03 244.03" overflow="hidden">
+<metadata sdrawwebVerConverted="6.2.0.0"/>
+<g>
+<g data-dojo-attach-point="viewport" id="ttn-diagram" transform="matrix(1 0 0 -1 0 0)" stroke-width="0.1" stroke="#000000" fill="#FFFFFF" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round" fill-opacity="1.0" fill-rule="evenodd" font-family="Arial">
+<metadata nversion="1"/>
+<g ttn-agent="layer" id="ttn-layer-symbol">
+<metadata nversion="2" slayer="symbol" sstrokePattern="solid"/>
+<g ttn-agent="street" stroke-width="4">
+<metadata nversion="3" nlaneWidth="120" stravelDirBorder="M-336,0 L336,0 " ssurfaceType="paved" sstrokePattern="solid">
+<components type="array">
+<stripe nkey="1">
+<primary sprofile="M-336,120 L336,120">
+<patterns type="array">
+<item spattern="singlesolid" nstartPct="0" bpaintable="true"/>
+</patterns>
+</primary>
+</stripe>
+<lane nkey="2" nwidth="120" sprofile="M-336,60 L336,60" nlaneType="0"/>
+<stripe nkey="3">
+<primary sprofile="M-336,0 L336,0">
+<patterns type="array">
+<item spattern="singledash" nstartPct="0" bpaintable="true" ndashLength="96" ngapLength="48" ninitDash="96" ninitGap="0"/>
+</patterns>
+</primary>
+</stripe>
+<lane nkey="4" nwidth="120" sprofile="M-336,-60 L336,-60" nlaneType="0"/>
+<stripe nkey="5">
+<primary sprofile="M-336,-120 L336,-120">
+<patterns type="array">
+<item spattern="singlesolid" nstartPct="0" bpaintable="true"/>
+</patterns>
+</primary>
+</stripe>
+</components>
+</metadata>
+<path ttn-role="axis" ttn-agent="polyArc" d="M-336,0 L336,0" fill="none" stroke-width="0" stroke-opacity="0" class="ttn-selection-line" stroke-linecap="butt"/>
+<path ttn-role="interior" d="M-336,120 L336,120 L336,-120 L-336,-120" stroke="none" stroke-width="0" fill="transparent"/>
+<g ttn-agent="stripe">
+<metadata nversion="1" sstrokePattern="solid" nkey="1"/>
+<path ttn-role="visibleCore" fill="none" d="M-336,120 L336,120"/>
+</g>
+<g ttn-agent="stripe">
+<metadata nversion="1" sstrokePattern="solid" nkey="3"/>
+<path ttn-role="visibleCore" fill="none" d="M-336,0 L-240,0 M-192,0 L-96,0 M-48,0 L48,0 M96,0 L192,0 M240,0 L336,0"/>
+</g>
+<g ttn-agent="stripe">
+<metadata nversion="1" sstrokePattern="solid" nkey="5"/>
+<path ttn-role="visibleCore" fill="none" d="M-336,-120 L336,-120"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>

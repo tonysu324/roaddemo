@@ -1,0 +1,13 @@
+﻿/RoadEngineWeb/obj
+/RoadEngineWeb/bin
+# Visual Studio 2015 cache/options directory
+/RoadEngine.vs
+/.vs
+/.vs/eps/v15/.su
+/RoadEngine.vs/slnx.sqlite
+/RoadEngine.vs/VSWorkspaceState.json
+/RoadEngine.vs/RoadEngine/v15/.suo
+/RoadEngine/.vs/RoadEngine/v15/sqlite3/storage.ide
+/nuget packages
+/packages
+

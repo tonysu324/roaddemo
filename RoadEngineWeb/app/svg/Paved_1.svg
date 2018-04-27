@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--PAE symbol-->
+<!--Copyright Â© 2017 PAE National Security Solutions LLC. All Rights Reserved.-->
+<svg diagramVersion="5" id="ttn-svgroot" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-82.22 -216.76 244.03 300.03" overflow="hidden">
+<metadata sdrawwebVerConverted="6.2.0.0"/>
+<g>
+<g data-dojo-attach-point="viewport" id="ttn-diagram" transform="matrix(1 0 0 -1 0 0)" stroke-width="0.1" stroke="#000000" fill="#FFFFFF" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round" fill-opacity="1.0" fill-rule="evenodd" font-family="Arial">
+<metadata nversion="1"/>
+<g ttn-agent="layer" id="ttn-layer-symbol" display="none">
+<metadata nversion="2" slayer="symbol" sstrokePattern="solid"/>
+<g ttn-agent="street" stroke-width="4">
+<metadata nversion="3" nlaneWidth="120" stravelDirBorder="M0,336 L0,-336 " ssurfaceType="paved" sstrokePattern="solid">
+<components type="array">
+<stripe nkey="1">
+<primary sprofile="M120,336 L120,-336">
+<patterns type="array">
+<item spattern="singlesolid" nstartPct="0" bpaintable="true"/>
+</patterns>
+</primary>
+</stripe>
+<lane nkey="2" nwidth="120" sprofile="M60,336 L60,-336" nlaneType="0"/>
+<stripe nkey="3">
+<primary sprofile="M0,336 L0,-336">
+<patterns type="array">
+<item spattern="singledash" nstartPct="0" bpaintable="true" ndashLength="96" ngapLength="48" ninitDash="96" ninitGap="0"/>
+</patterns>
+</primary>
+</stripe>
+<lane nkey="4" nwidth="120" sprofile="M-60,336 L-60,-336" nlaneType="0"/>
+<stripe nkey="5">
+<primary sprofile="M-120,336 L-120,-336">
+<patterns type="array">
+<item spattern="singlesolid" nstartPct="0" bpaintable="true"/>
+</patterns>
+</primary>
+</stripe>
+</components>
+</metadata>
+<path ttn-role="axis" ttn-agent="polyArc" d="M0,336 L0,-336" fill="none" stroke-width="0" stroke-opacity="0" class="ttn-selection-line" stroke-linecap="butt"/>
+<path ttn-role="interior" d="M120,336 L120,-336 L-120,-336 L-120,336" stroke="none" stroke-width="0" fill="transparent"/>
+<g ttn-agent="stripe">
+<metadata nversion="1" sstrokePattern="solid" nkey="1"/>
+<path ttn-role="visibleCore" fill="none" d="M120,336 L120,-336"/>
+</g>
+<g ttn-agent="stripe">
+<metadata nversion="1" sstrokePattern="solid" nkey="3"/>
+<path ttn-role="visibleCore" fill="none" d="M0,336 L0,240 M0,192 L0,96 M0,48 L0,-48 M0,-96 L0,-192 M0,-240 L0,-336"/>
+</g>
+<g ttn-agent="stripe">
+<metadata nversion="1" sstrokePattern="solid" nkey="5"/>
+<path ttn-role="visibleCore" fill="none" d="M-120,336 L-120,-336"/>
+</g>
+</g>
+</g>
+<g ttn-agent="layer" id="ttn-layer-thumbnail">
+<metadata nversion="2" slayer="thumbnail" sstrokePattern="solid"/>
+<g ttn-agent="articulating" stroke-width="0.1">
+<metadata nversion="2" sstrokePattern="solid" sresizeHandleType="all" sstretchLimits="fixed" bshowResizeHandles="true" bcanSelectComponents="false" ntxtPosition="0"/>
+<g ttn-role="core" ttn-agent="articulatingCore" stroke-width="0" stroke-opacity="0" fill="transparent" pointer-events="none" transform="matrix(1,0,0,1,39.8,66.74)">
+<metadata nversion="1"/>
+<rect ttn-role="core" x="-122.02px" y="-150.02px" width="244.03px" height="300.03px" rx="0.1px" ry="0.1px"/>
+</g>
+<g ttn-role="content" ttn-agent="articulatingContent">
+<metadata nversion="1"/>
+<g ttn-agent="articulatingNode" ttn-key="1" transform="matrix(1,0,0,1,39.8,66.74)">
+<metadata nversion="2" bexcludeFromControlRect="false"/>
+<g ttn-agent="cluster" ttn-role="core">
+<metadata nversion="1" sstrokePattern="solid" ntxtPosition="0" sresizeHandleType="all" bshowResizeHandles="true"/>
+<g ttn-role="core">
+<line x1="-120px" y1="148px" x2="-120px" y2="-148px" stroke-width="4">
+<metadata nversion="1" sstrokePattern="solid"/>
+</line>
+<line x1="120px" y1="148px" x2="120px" y2="-148px" stroke-width="4">
+<metadata nversion="1" sstrokePattern="solid"/>
+</line>
+<line x1="0px" y1="120px" x2="0px" y2="24px" stroke-width="4">
+<metadata nversion="1" sstrokePattern="solid"/>
+</line>
+<line x1="0px" y1="-24px" x2="0px" y2="-120px" stroke-width="4">
+<metadata nversion="1" sstrokePattern="solid"/>
+</line>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>
