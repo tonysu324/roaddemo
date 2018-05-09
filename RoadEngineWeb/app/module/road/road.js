@@ -2,10 +2,13 @@
 'use strict';
 
 var roadObject = {
-    width: 280,
-    height: 100
+    width: $("body").width() > 420 ? 280 : 140,
+    height: $("body").width() > 420 ? 100 : 50
 }
-
+var verticalRoadObject = {
+    width: $("body").width() > 420 ? 100 : 50,
+    height: $("body").width() > 420 ? 280 : 140,
+}
 class MainPanel extends React.Component {
     constructor(props) {
         super(props);
@@ -36,7 +39,6 @@ class MainPanel extends React.Component {
 
     onTopMidContollerPointClicked() {
         this.movingType = 'TopMid';
-
     }
 
     onLine2RightContollerPointClicked() {
@@ -52,18 +54,47 @@ class MainPanel extends React.Component {
     }
 
     addRoad(event) {
-        this.setState({ renderRoad: true, point: { x: event.clientX - 200, y: event.clientY } });
+        var e;
+        var leftWidth = $(".nav-panel").width();
+        if (event.type == "touchmove") {
+            e = event.touches[0];
+        } else {
+            e = event;
+        }
+        this.setState({ renderRoad: true, point: { x: e.clientX - leftWidth, y: e.clientY } });
+    }
+
+    addVerticalRoad = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        var e;
+        var leftWidth = $(".nav-panel").width();
+        if (event.type == "touchmove") {
+            e = event.touches[0];
+        } else {
+            e = event;
+        }
+        this.movingType = 'VerticalRoad';
+        this.setState({ renderRoad: true, point: { x: e.clientX - leftWidth, y: e.clientY } });
     }
 
     startMove = (event) => {
+        var e;
+        var leftWidth = $(".nav-panel").width();
+        if (event.type == "touchmove") {
+            e = event.touches[0];
+        } else {
+            e = event;
+        }
         if (this.state.renderRoad && this.movingType != '') {
-            this.setState({ point: { x: event.clientX - 200, y: event.clientY } });
+            this.setState({ point: { x: e.clientX - leftWidth, y: e.clientY} });
         }
     }
 
     stopMove = (event) => {
         this.movingType = '';
     }
+ 
 
     render() {
         return (
@@ -75,22 +106,22 @@ class MainPanel extends React.Component {
                     <div style={{ margin: 7 }}>
                         <div className="nav" title="Drag and drop the Paved 1 tool on the drawing to add a vertical street.">
                             <div>
-                                <div className="symbol-item form-group" draggable="true" id="paved1" className="cursor-pointer" onDragEnd={this.addRoad}>
+                                <div className="symbol-item form-group" draggable="true" id="paved1" className="cursor-pointer" onTouchMove={this.addVerticalRoad}  onDragEnd={this.addVerticalRoad}>
                                     <div alt="Paved 1" className="symbol-item-svg fl">
-                                        <object type="image/svg+xml" width="20" height="26" data="../svg/Paved_1.svg" style={{ marginTop: 5 }}></object>
+                                        <img src="../svg/Paved_1.png"/>
                                     </div>
-                                    <div className="symbol-item-text fl">Paved 1</div>
+                                    <div className="symbol-item-text fl">&nbsp;Paved 1</div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="nav" title="Drag and drop the Paved 2 tool on the drawing to add a horizontal street.">
                             <div>
-                                <div className="symbol-item form-group" draggable="true" id="paved2" className="cursor-pointer" onDragEnd={this.addRoad}>
+                                <div className="symbol-item form-group" draggable="true" id="paved2" className="cursor-pointer" onTouchMove={this.addRoad} onDragEnd={this.addRoad}>
                                     <div className="symbol-item-svg fl" alt="Paved 2">
-                                        <object type="image/svg+xml" width="40" data="../svg/Paved_2.svg"></object>
+                                        <img src="../svg/Paved_2.png" />
                                     </div>
-                                    <div className="symbol-item-text fl">Paved 2</div>
+                                    <div className="symbol-item-text fl">&nbsp;Paved 2</div>
                                 </div>
 
                             </div>
@@ -100,7 +131,7 @@ class MainPanel extends React.Component {
 
                 {/* The right main drawing panel */}
                 <div id="mainContent" className="drawing-panel">
-                    <svg id="svgroot" xmlnsXlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" overflow="hidden" height="100%" width="100%" onMouseMove={this.startMove} onMouseUp={this.stopMove}>
+                    <svg id="svgroot" xmlnsXlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" overflow="hidden" height="600" width="100%" onMouseMove={this.startMove} onMouseUp={this.stopMove} onTouchMove={this.startMove} onTouchEnd={this.stopMove}>
 
                         <g id="svgroot-main-panel">
                             {this.renderRoad()}
@@ -161,12 +192,18 @@ class Road extends React.Component {
         this.coordinatePath = {
             roadMatrix: "",
             topleftPointPath: "",
-            streetLine1: "M0,0 L280,0",
+            streetLine1: "M0,0 L" + this.object.width + ",0",
             streetLine2: this.getLine2Path(),
-            streetLine3: "M0,100 L280,100",
+            streetLine3: "M0," + this.object.height + " L" + this.object.width + "," + this.object.height,
             streetLine1RightRampPath: "",
             pavedFillPath: "M0,0 L" + this.object.width + ",0 L" + this.object.width + "," + this.object.height + " L0," + this.object.height,
             rotate: ""
+        };
+
+        this.verticalRoadParam = {
+            streetLine1: "",
+            streetLine2: "",
+            streetLine3: "",
         };
 
         this.lastRoadPoint = {
@@ -193,9 +230,16 @@ class Road extends React.Component {
                 x: this.props.point.x,
                 y: this.props.point.y
             }
+           
             this.coordinatePath.roadMatrix = "matrix(1 0 0 1 " + (this.props.point.x - this.object.width / 2) + " " + (this.props.point.y - this.object.height / 2) + ")";
             this.coordinatePath.roadPoint = { x: (this.props.point.x - this.object.width / 2), y: (this.props.point.y - this.object.height / 2) };
             this.coordinatePath.transform = "translate(" + this.coordinatePath.roadPoint.x + "," + this.coordinatePath.roadPoint.y + ")";
+        }
+        else if (this.props.movingType == 'VerticalRoad') {
+            this.lastVerticalRoadPoint = {
+                x: this.props.point.x,
+                y: this.props.point.y
+            }
         }
 
         this.coordinatePath.topleftPointPath = this.getTriangle({ x: 0, y: 0 }, "up");
@@ -206,12 +250,12 @@ class Road extends React.Component {
 
         this.coordinatePath.bottomleftPointPath = this.getTriangle({ x: 0, y: this.object.height }, "down");
         this.coordinatePath.bottomrightPointPath = this.getTriangle({ x: this.object.width - this.object.triangle.width, y: this.object.height }, "down");
-        this.coordinatePath.midleftPoint = { x: -30, y: this.object.centrePoint.y - this.object.rhombi.halfHeight, width: 10, height: 10 };
-        this.coordinatePath.midrightPoint = { x: this.object.width + 20, y: this.object.centrePoint.y - this.object.rhombi.halfHeight, transform: "", width: 10, height: 10 };
+        this.coordinatePath.midleftPoint = { x: -this.object.square.width * 3, y: this.object.centrePoint.y - this.object.rhombi.halfHeight, width: this.object.square.width, height: this.object.square.height };
+        this.coordinatePath.midrightPoint = { x: this.object.width + this.object.square.width * 2, y: this.object.centrePoint.y - this.object.rhombi.halfHeight, transform: "", width: this.object.square.width, height: this.object.square.height };
 
-        this.coordinatePath.midmidPointPath = this.getRhombi({ x: this.object.width / 2 - this.object.rhombi.halfHeight, y: this.object.height / 2 - this.object.rhombi.halfHeight });
-
-
+        this.coordinatePath.midmidBigPointPath = { x: this.object.width / 2 - this.object.rhombi.halfHeight, y: this.object.height / 2 - this.object.rhombi.halfHeight }
+        this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
+        
     }
 
     //draw all line,symbol,text path of this road component
@@ -254,7 +298,8 @@ class Road extends React.Component {
             this.coordinatePath.streetLine1 = "M0,0 L" + lPoint.x + ",0 M" + cPoint3.x + ",0 L" + this.object.width + ",0";
 
             this.coordinatePath.topRightPointPath = this.getTriangle({ x: this.object.width - this.object.triangle.width, y: movePointY }, "up");
-            this.coordinatePath.midmidPointPath = this.getRhombi({ x: this.object.width / 2 - this.object.rhombi.halfHeight, y: this.object.height / 2 - this.object.rhombi.halfHeight });
+            this.coordinatePath.midmidBigPointPath = { x: this.object.width / 2 - this.object.rhombi.halfHeight, y: this.object.height / 2 - this.object.rhombi.halfHeight }
+            this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
 
             this.drawLine1RightText();//change text 
 
@@ -271,6 +316,10 @@ class Road extends React.Component {
         }
         else if (this.props.movingType == 'Line2Mid') {
             this.moveToDrawLine2MidControllerPoint();
+        }
+
+        else if (this.props.movingType == 'VerticalRoad') {
+            this.moveToDrawVerticalRoad();
         }
     }
 
@@ -347,7 +396,8 @@ class Road extends React.Component {
 
         this.object.maskLayerPaths.path1 = "M0," + this.object.height / 2 + " L" + this.object.width + "," + this.object.height / 2;
 
-        this.coordinatePath.midmidPointPath = this.getRhombi({ x: this.object.width / 2 - this.object.rhombi.halfHeight, y: this.object.height / 2 - this.object.rhombi.halfHeight });
+        this.coordinatePath.midmidBigPointPath = { x: this.object.width / 2 - this.object.rhombi.halfHeight, y: this.object.height / 2 - this.object.rhombi.halfHeight }
+        this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
 
         this.getLine1RightRampPath();
 
@@ -376,7 +426,9 @@ class Road extends React.Component {
 
         this.object.maskLayerPaths.path1 = "M0," + this.object.height / 2 + " L" + this.object.width + "," + this.object.height / 2;
 
-        this.coordinatePath.midmidPointPath = this.getRhombi({ x: this.object.width / 2 - this.object.rhombi.halfHeight, y: this.object.height / 2 - this.object.rhombi.halfHeight });
+     
+        this.coordinatePath.midmidBigPointPath = { x: this.object.width / 2 - this.object.rhombi.halfHeight, y: this.object.height / 2 - this.object.rhombi.halfHeight }
+        this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
 
         this.getLine1RightRampPath();
 
@@ -432,16 +484,18 @@ class Road extends React.Component {
 
         this.object.maskLayerPaths.path1 = "M0," + this.object.height / 2 + " A" + r + "," + r + " 0 " + isBigCircle + " " + toward + " " + this.object.width + "," + this.object.height / 2;
 
-        this.coordinatePath.midmidPointPath = this.getRhombi({ x: this.object.width / 2, y: movePointY });
+        this.coordinatePath.midmidBigPointPath = { x: this.object.width / 2, y: movePointY };
+        this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
 
+ 
         var x = this.object.width / 2;
-        var y = movePointY / 2 + 20;
+        var y = movePointY / 2 + this.object.square.height * 2;
 
         var totateDeg = - Math.atan(x / y) * 180 / Math.PI;
         this.coordinatePath.midrightPoint.width = this.coordinatePath.midrightPoint.height = 0;
         this.coordinatePath.midleftPoint.width = this.coordinatePath.midleftPoint.height = 0;
 
-        this.coordinatePath.midrightPoint.transform = "rotate(" + totateDeg + "," + (this.object.width + 20) + "," + (this.object.height / 2 + 10) + ")";
+        this.coordinatePath.midrightPoint.transform = "rotate(" + totateDeg + "," + (this.object.width + this.object.square.width * 2) + "," + (this.object.height / 2 + this.object.square.height) + ")";
     }
 
     moveToDrawLine1RightRamp(movePointX) {
@@ -460,6 +514,14 @@ class Road extends React.Component {
         this.coordinatePath.line1RightRampTrianglePath = this.getTriangle({ x: (cPoint1.x + 3 + (cPoint2.x - cPoint1.x) / 2), y: (this.object.rightY / 2 + 3) }, "right");
         this.coordinatePath.streetLine1 = "M0,0 L" + lPoint.x + ",0 M" + cPoint3.x + ",0 L" + this.object.width + ",0";
     }
+
+    moveToDrawVerticalRoad() {
+        var movePointX = this.props.point.x - this.lastRoadPoint.x - roadObject.width / 2;// X mouse moving distance
+        var movePointY = this.props.point.y - this.lastRoadPoint.y;
+        $("#mainpaved1").removeClass("display-none");
+
+    }
+
     //-------------DRAWING WHEN MOVING DEFINE END--------------
 
     //-------------GET POINTS OR PATHS DEFINE------------------
@@ -501,7 +563,9 @@ class Road extends React.Component {
             this.object.Line1RightCPoint3 = cPoint3;
 
             this.coordinatePath.streetLine1RightRampPath = "M0,0  L" + lPoint.x + "," + lPoint.y + " C" + cPoint1.x + "," + cPoint1.y + " " + cPoint2.x + "," + cPoint2.y + " " + cPoint3.x + "," + cPoint3.y + " L" + this.object.width + "," + this.object.rightY;
-            this.coordinatePath.line1RightRampTrianglePath = this.getTriangle({ x: (cPoint1.x + 3 + (cPoint2.x - cPoint1.x) / 2), y: (this.object.rightY / 2 + 3) }, "right");
+            this.coordinatePath.line1RightRampTrianglePath = this.getTriangle({
+                x: (cPoint1.x + this.object.triangle.halfWidth / 2 + (cPoint2.x - cPoint1.x) / 2), y: (this.object.rightY / 2 + this.object.triangle.halfHeight / 2)
+        }, "right");
         }
         else {
             this.coordinatePath.streetLine1RightRampPath = "";
@@ -570,8 +634,15 @@ class Road extends React.Component {
     }
     //-------------GET POINTS OR PATHS DEFINE END--------------
 
+    selectedPaved1 = (event) => {
+        this.object.maskLayerPaths.path1 = "";
+       
+    }
+
     render() {
         this.renderRoad();
+
+        $('#console').text("svgroot height:" + $("#svgroot").height() + ",body: width" + $('body').width() + ", height" + $('body').height());
 
         return (
             <g transform={this.coordinatePath.transform}  >
@@ -580,7 +651,41 @@ class Road extends React.Component {
                         <path d="M2,2 L2,11 L10,6 L2,2" style={{ fill: 'lime' }} />
                     </marker>
                 </defs>
-                <g id="mainpaved2" onMouseDown={this.readyMoveRoad} >
+
+                <g id="mainpaved1" onClick={this.selectedPaved1} className="display-none">
+                    <g fill="#FFFFFF" fillOpacity="1.0" fillRule="evenodd" stroke="#000000" strokeWidth="1" strokeOpacity="1.0" strokeLinecap="round" strokeLinejoin="round" textAnchor="middle" fontWeight="normal">
+                        <g strokeWidth="2" >
+                            <g>
+                                <path fill="none" d="M90,-90 L90,190"></path>
+                            </g>
+
+                            <g>
+                                <path fill="none" d="M90,-90 L90,190"></path>
+                            </g>
+                            <g>
+                               
+                                <path fill="none" d="M140,-90 L140,190" strokeDasharray="20,20,20,20,10,20"  fill="none" ></path>
+                            </g>
+                            <g>
+                                <path fill="none" d="M190,-90 L190,190"></path>
+                            </g>
+                        </g>
+                        <g>
+                            <g fill="#FFFFFF" fillOpacity="0" strokeOpacity="0" strokeWidth="0">
+                                <path d={this.pavedFillPath}></path>
+                            </g>
+                        </g>
+                    </g>
+                    <g stroke="lime" strokeWidth="2" strokeDasharray="12 7" strokeOpacity="1" fill="none" className="display-none">
+                        <path d={this.object.maskLayerPaths.path2} strokeWidth={this.object.width} strokeOpacity="1" strokeLinecap="butt" strokeDasharray="none" stroke="#808080"></path>
+                        <path d={this.object.maskLayerPaths.path2}></path>
+                        <path d={this.object.maskLayerPaths.path2} fill="none" strokeLinecap="butt"></path>
+                    </g>
+
+
+                </g>
+
+                <g id="mainpaved2" onMouseDown={this.readyMoveRoad} onTouchStart={this.readyMoveRoad} >
                     <g fill="#FFFFFF" fillOpacity="1.0" fillRule="evenodd" stroke="#000000" strokeWidth="1" strokeOpacity="1.0" strokeLinecap="round" strokeLinejoin="round" textAnchor="middle" fontWeight="normal">
                         <g strokeWidth="2" >
                             <g>
@@ -591,7 +696,7 @@ class Road extends React.Component {
                                 <path fill="none" d={this.coordinatePath.streetLine1}></path>
                             </g>
                             <g>
-                                <path fill="none" d={this.coordinatePath.streetLine2} strokeLinecap="butt"></path>
+                                <path fill="none" d={this.coordinatePath.streetLine2} strokeDasharray="20,20,20,20,10,20"  strokeLinecap="butt"></path>
                             </g>
                             <g>
                                 <path fill="none" d={this.coordinatePath.streetLine3}></path>
@@ -603,7 +708,7 @@ class Road extends React.Component {
                             </g>
                         </g>
                     </g>
-                    <g stroke="lime" strokeWidth="2" strokeDasharray="12 7" strokeOpacity="1" fill="none">
+                    <g stroke="lime" strokeWidth="2" strokeDasharray="20,20,20,20,10,20" strokeOpacity="1" fill="none" className="display-none">
                         <path d={this.object.maskLayerPaths.path1} strokeWidth={this.object.height} strokeOpacity="1" strokeLinecap="butt" strokeDasharray="none" stroke="#808080"></path>
                         <path d={this.object.maskLayerPaths.path1}></path>
                         <path d={this.object.maskLayerPaths.path1} fill="none" strokeLinecap="butt"></path>
@@ -621,16 +726,20 @@ class Road extends React.Component {
                     <g id="topleft-arrow" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime"  >
                         <path d={this.coordinatePath.topleftPointPath} cursor="crosshair" ></path>
                     </g>
-                    <g id="topright-arrow" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onMouseDown={this.readyMoveLine1Right}>
+                    <g id="topright-arrow" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onTouchStart={this.readyMoveLine1Right} onMouseDown={this.readyMoveLine1Right}>
                         <path d={this.coordinatePath.topRightPointPath} cursor="crosshair" ></path>
                     </g>
-                    <g id="midleft" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onMouseDown={this.readyLine2LeftMove}>
+                    <g id="midleft" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onTouchStart={this.readyLine2LeftMove} onMouseDown={this.readyLine2LeftMove}>
                         <rect x={this.coordinatePath.midleftPoint.x} y={this.coordinatePath.midleftPoint.y} width={this.coordinatePath.midrightPoint.width} height={this.coordinatePath.midrightPoint.height} cursor="crosshair"></rect>
                     </g>
-                    <g id="midmid" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onMouseDown={this.readyLine2MidMove}>
+                    <g id="midmid" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onMouseDown={this.readyLine2MidMove} onTouchStart={this.readyLine2MidMove}>
                         <path d={this.coordinatePath.midmidPointPath} cursor="crosshair"></path>
                     </g>
-                    <g id="midright" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onMouseDown={this.readyLine2RightMove}>
+                    {/* <g id="midmidMobilePoint" strokeDasharray="12 7" strokeOpacity="1" fill="none" >
+                        <circle cx={this.coordinatePath.midmidBigPointPath.x} cy={this.coordinatePath.midmidBigPointPath.y} r="20" stroke="black"
+                            strokeWidth="2" fill="red" />
+                    </g> */}
+                    <g id="midright" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onTouchStart={this.readyLine2RightMove} onMouseDown={this.readyLine2RightMove}>
                         <rect x={this.coordinatePath.midrightPoint.x} y={this.coordinatePath.midrightPoint.y} transform={this.coordinatePath.midrightPoint.transform} width={this.coordinatePath.midrightPoint.width} height={this.coordinatePath.midrightPoint.height} cursor="crosshair" ></rect>
                     </g>
                     <g id="bottomleft-arrow" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime">
@@ -639,7 +748,7 @@ class Road extends React.Component {
                     <g id="bottomright-arrow" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime">
                         <path d={this.coordinatePath.bottomrightPointPath} cursor="crosshair" ></path>
                     </g>
-                    <g stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onMouseDown={this.readyLine1RightRampMove}>
+                    <g stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onTouchStart={this.readyLine1RightRampMove}  onMouseDown={this.readyLine1RightRampMove}>
                         <path d={this.coordinatePath.line1RightRampTrianglePath} cursor="crosshair" ></path>
                     </g>
                 </g>

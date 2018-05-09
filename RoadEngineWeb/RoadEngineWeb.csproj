@@ -90,7 +90,9 @@
     <Content Include="app\js\svg.js" />
     <Content Include="app\main\index.html" />
     <Content Include="app\module\road\road.js" />
+    <Content Include="app\svg\Paved_1.png" />
     <Content Include="app\svg\Paved_1.svg" />
+    <Content Include="app\svg\Paved_2.png" />
     <Content Include="app\svg\Paved_2.svg" />
     <Content Include="index.html" />
     <Content Include="Web.config" />
