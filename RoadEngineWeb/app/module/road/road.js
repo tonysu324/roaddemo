@@ -170,7 +170,8 @@ class Road extends React.Component {
         };
 
         this.commonParam = {
-            distance:40,
+            distance: 40,
+            minShowSymbolDistance: 30,
             triangle: {
                 width: 12,
                 height: 12,
@@ -232,25 +233,25 @@ class Road extends React.Component {
         this.verticalRoadParam = {
             width: verticalRoadObject.width,
             height: verticalRoadObject.height,
-            maskLayerStrokeWidth: verticalRoadObject.width - 2,
+            maskLayerStrokeWidth: verticalRoadObject.width - 2,// background width of vertical road 
             line2Point1: { x: 0, y: 0, transform:""},
             line2Point2: { x: 0, y: 0, transform: "" },
-            line3Point2M1: { x: 0, y: 0 },
-            line3Point2M2: { x: 0, y: 0 },
-            line3Point2M3: { x: 0, y: 0 },
+            line3Point2M1: { x: 0, y: 0, width: this.commonParam.square.width, height: this.commonParam.square.height },//vertical road ramp point of start
+            line3Point2M2: { x: 0, y: 0, width: this.commonParam.square.width, height: this.commonParam.square.height },//vertical road ramp point of end
+            line3Point2M3: { x: 0, y: 0, width: this.commonParam.square.width, height: this.commonParam.square.height },//vertical road and horizontal road middle point
             line3Point2LPath: "",
             line3Point2QPath:"",
             streetLine1: "M" + (roadObject.width / 2 - roadObject.height / 2) + "," + (-roadObject.width / 2 + roadObject.height / 2) + " L" + (roadObject.width / 2 - roadObject.height / 2) + "," + (roadObject.width / 2 + roadObject.height / 2),
             streetLine2: "M" + roadObject.width / 2 + "," + (-roadObject.width / 2 + roadObject.height / 2) + " L" + (roadObject.width / 2) + "," + (roadObject.width / 2 + roadObject.height / 2),
             streetLine3: "M" + (roadObject.width / 2 + roadObject.height / 2) + "," + (-roadObject.width / 2 + roadObject.height / 2) + " L" + (roadObject.width / 2 + roadObject.height / 2) + "," + (roadObject.width / 2 + roadObject.height / 2),
             maskLayerPath1: "M" + (roadObject.width / 2) + "," + (-roadObject.width / 2 + roadObject.height / 2) + " L" + (roadObject.width / 2) + "," + (roadObject.width / 2 + roadObject.height / 2),
-            point2TextH: {
+            point2TextH: {//line3 of horizontal road's text
                 text: "",
                 textLength: 0,
                 textLine: "",
                 textRoate:"",
             },
-            point2TextV: {
+            point2TextV: {//line3 of vertical road's text
                 text: "",
                 textLength: 0,
                 textLine: "",
@@ -410,7 +411,7 @@ class Road extends React.Component {
         }
     }
 
-    drawVLine3Point2Text() {
+    drawVLine3Point2Text(isHide) {
         var text = (this.verticalRoadCoordinates.line3Point2.MQ1YSpace) / 4 + "";
         if (text.length > 4) text = text.substring(0, text.indexOf("."));
        
@@ -421,7 +422,7 @@ class Road extends React.Component {
 
         var x = this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width - 15;
         this.verticalRoadParam.point2TextV.y = this.horizontalRoadParam.height + y + 25;
-        if (this.verticalRoadParam.point2TextV.textLength > y || y < 25) {
+        if (this.verticalRoadParam.point2TextV.textLength > y || y < 25 || isHide) {
             this.verticalRoadParam.point2TextV.text = "";
             this.verticalRoadParam.point2TextV.textLine = "";
         }
@@ -435,7 +436,7 @@ class Road extends React.Component {
         }
     }
 
-    drawHLine3Point2Text() {
+    drawHLine3Point2Text(isHide) {
         var text = (this.verticalRoadCoordinates.line3Point2.MQ1XSpace) / 4 + "";
         if (text.length > 4) text = text.substring(0, text.indexOf("."));
 
@@ -446,7 +447,7 @@ class Road extends React.Component {
 
         var x = this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width;
         this.verticalRoadParam.point2TextH.y = this.horizontalRoadParam.height  - 25;
-        if (this.verticalRoadParam.point2TextH.textLength > y || y < 25) {
+        if (this.verticalRoadParam.point2TextH.textLength > y || y < 25 || isHide) {
             this.verticalRoadParam.point2TextH.text = "";
             this.verticalRoadParam.point2TextH.textLine = "";
         }
@@ -498,9 +499,9 @@ class Road extends React.Component {
     }
 
     readyVerticalRoadMove = (event) => {
-       // this.props.tellParentVerticalRoadHaveBeenClicked();
-       // event.stopPropagation();
-        //event.preventDefault();
+        this.props.tellParentVerticalRoadHaveBeenClicked();
+        event.stopPropagation();
+        event.preventDefault();
     }
     readyline3Point2M3Move = (event) => {
        
@@ -565,7 +566,6 @@ class Road extends React.Component {
 
         this.horizontalRoadParam.maskLayerPaths.path1 = "M0," + this.horizontalRoadParam.height / 2 + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height / 2;
 
-     
         this.coordinatePath.midmidBigPointPath = { x: this.horizontalRoadParam.width / 2 - this.commonParam.rhombi.halfHeight, y: this.horizontalRoadParam.height / 2 - this.commonParam.rhombi.halfHeight }
         this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
 
@@ -608,8 +608,6 @@ class Road extends React.Component {
         var line1RightPoint = this.getLine1RightControllerPoint(line1LeftPoint, midMovePointY, 1);
         this.coordinatePath.topleftPointPath = this.getTriangle(line1LeftPoint, "up");
         this.coordinatePath.topRightPointPath = this.getTriangle(line1RightPoint, "up");
-
-        //console.log("deg:" + deg + " ;r:" + r + " ;isBigCircle:" + isBigCircle + " ;midMovePointY:" + midMovePointY + " ;line1LeftPoint.x:" + line1LeftPoint.x + " line1LeftPoint.y:" + line1LeftPoint.y + " line1R:" + line1R);
 
         var line3LeftPoint = this.getLine3LeftControllerPoint(midMovePointY, deg, c, 1);
 
@@ -655,32 +653,34 @@ class Road extends React.Component {
     }
 
     moveToDrawVerticalRoad() {
-        var movePointX = this.props.point.x - this.lastRoadPoint.x - roadObject.height / 2;// X mouse moving distance
+        var movePointX = this.props.point.x - this.lastRoadPoint.x - this.horizontalRoadParam.height / 2;// X mouse moving distance
         var movePointY = this.props.point.y - this.lastRoadPoint.y;
-        this.verticalRoadCoordinates.startPoint = { x: (roadObject.width / 2 - roadObject.height / 2 + movePointX), y: -roadObject.width / 2 + roadObject.height / 2 + movePointY };
-        this.verticalRoadCoordinates.endPoint = { x: (roadObject.width / 2 - roadObject.height / 2 + movePointX), y: (roadObject.width / 2 + roadObject.height / 2 + movePointY) };
+        this.verticalRoadCoordinates.startPoint = { x: (this.horizontalRoadParam.width / 2 - this.horizontalRoadParam.height / 2 + movePointX), y: -this.horizontalRoadParam.width / 2 + this.horizontalRoadParam.height / 2 + movePointY };
+        this.verticalRoadCoordinates.endPoint = { x: (this.horizontalRoadParam.width / 2 - this.horizontalRoadParam.height / 2 + movePointX), y: (this.horizontalRoadParam.width / 2 + this.horizontalRoadParam.height / 2 + movePointY) };
 
-        //if ((this.verticalRoadCoordinates.startPoint.x - this.commonParam.distance) < 0) {
-        //    movePointX = 0;
-        //    this.verticalRoadCoordinates.startPoint.x = this.commonParam.distance;
-        //}
-        //else if (this.verticalRoadCoordinates.startPoint.x > (this.horizontalRoadParam.width - this.verticalRoadParam.width - this.commonParam.distance)) {
-        //    movePointX = 0;
-        //    this.verticalRoadCoordinates.startPoint.x = this.verticalRoadCoordinates.endPoint.x = this.horizontalRoadParam.width - this.verticalRoadParam.width - this.commonParam.distance;
-        //}
-        //if ((this.verticalRoadCoordinates.startPoint.y + this.commonParam.distance) < 0) {
-        //    movePointY = 0;
-        //    this.verticalRoadCoordinates.startPoint.y = - this.commonParam.distance;
-        //    this.verticalRoadCoordinates.endPoint.y = this.verticalRoadCoordinates.startPoint.y + this.verticalRoadParam.height;
-        //} else if ((this.verticalRoadCoordinates.endPoint.y - 2 * this.commonParam.distance  ) < this.horizontalRoadParam.height) {
-        //    movePointY = 0;
-        //    this.verticalRoadCoordinates.endPoint.y = this.horizontalRoadParam.height + this.commonParam.distance;
-        //    this.verticalRoadCoordinates.startPoint.y = this.verticalRoadCoordinates.endPoint.y - this.verticalRoadParam.height;
-        //}
+        if ((this.verticalRoadCoordinates.startPoint.x - this.commonParam.distance) < 0) {
+            movePointX = 0;
+            this.verticalRoadCoordinates.startPoint.x = this.verticalRoadCoordinates.endPoint.x = this.commonParam.distance;
+        }
+        else if (this.verticalRoadCoordinates.startPoint.x > (this.horizontalRoadParam.width - this.verticalRoadParam.width - this.commonParam.distance)) {
+            movePointX = 0;
+            this.verticalRoadCoordinates.startPoint.x = this.verticalRoadCoordinates.endPoint.x = this.horizontalRoadParam.width - this.verticalRoadParam.width - this.commonParam.distance;
+        }
+
+        if ((this.verticalRoadCoordinates.startPoint.y + this.commonParam.distance) > 0) {
+            movePointY = 0;
+            this.verticalRoadCoordinates.startPoint.y = - this.commonParam.distance;
+            this.verticalRoadCoordinates.endPoint.y = this.verticalRoadCoordinates.startPoint.y + this.verticalRoadParam.height;
+        }
+        else if ((this.verticalRoadCoordinates.endPoint.y -  this.commonParam.distance) < this.horizontalRoadParam.height) {
+            movePointY = 0;
+            this.verticalRoadCoordinates.endPoint.y = this.horizontalRoadParam.height + this.commonParam.distance;
+            this.verticalRoadCoordinates.startPoint.y = this.verticalRoadCoordinates.endPoint.y - this.verticalRoadParam.height;
+        }
     
         var line1Intersection = { x: 0, y: 0 };
-        var space = 40;
-        if (this.verticalRoadCoordinates.startPoint.x < roadObject.width)
+        var space = this.commonParam.distance;
+        if (this.verticalRoadCoordinates.startPoint.x < this.horizontalRoadParam.width)
         {
             line1Intersection.x = this.verticalRoadCoordinates.startPoint.x;
             line1Intersection.y = 0;
@@ -693,25 +693,26 @@ class Road extends React.Component {
         $("#paved1MaskLayer").removeClass("display-none");
         $("#paved1Point").removeClass("display-none");
 
+        this.verticalRoadParam.streetLine1 = "M" + this.verticalRoadCoordinates.startPoint.x + "," + this.verticalRoadCoordinates.startPoint.y + " L" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y - space) + " Q " + line1Intersection.x + "," + line1Intersection.y + " " + (line1Intersection.x - space) + ",0  M" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " Q " + line1Intersection.x + "," + (line1Intersection.y + this.horizontalRoadParam.height) + " " + (line1Intersection.x - space) + "," + (line1Intersection.y + this.horizontalRoadParam.height) + "  M" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " L" + this.verticalRoadCoordinates.endPoint.x + "," + this.verticalRoadCoordinates.endPoint.y;
 
-        this.verticalRoadParam.streetLine1 = "M" + this.verticalRoadCoordinates.startPoint.x + "," + this.verticalRoadCoordinates.startPoint.y + " L" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y - space) + " Q " + line1Intersection.x + "," + line1Intersection.y + " " + (line1Intersection.x - space) + ",0  M" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y + roadObject.height + space) + " Q " + line1Intersection.x + "," + (line1Intersection.y + roadObject.height) + " " + (line1Intersection.x - space) + "," + (line1Intersection.y + roadObject.height) + "  M" + this.verticalRoadCoordinates.startPoint.x  + "," + (line1Intersection.y + roadObject.height + space) + " L" + this.verticalRoadCoordinates.endPoint.x + "," + this.verticalRoadCoordinates.endPoint.y;
-
-        this.verticalRoadParam.streetLine2 = "M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width / 2) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width / 2) + "," + (line1Intersection.y - space) + " M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width / 2) + "," + (line1Intersection.y + roadObject.height + space) + " L" + (this.verticalRoadCoordinates.endPoint.x + verticalRoadObject.width /2 ) + "," + this.verticalRoadCoordinates.endPoint.y;
+        this.verticalRoadParam.streetLine2 = "M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) + "," + (line1Intersection.y - space) + " M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " L" + (this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width / 2) + "," + this.verticalRoadCoordinates.endPoint.y;
         ;
-        var line3MQ2 = { x: this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width, y: line1Intersection.y + roadObject.height + space};
-        var line3Q2_1 = { x: line1Intersection.x + verticalRoadObject.width, y: line1Intersection.y + roadObject.height };
-        var line3Q2_2 = { x: line1Intersection.x + verticalRoadObject.width + space, y: line1Intersection.y + roadObject.height };
+        var line3MQ2 = { x: this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width, y: line1Intersection.y + this.horizontalRoadParam.height + space };
+        var line3Q2_1 = { x: line1Intersection.x + this.verticalRoadParam.width, y: line1Intersection.y + this.horizontalRoadParam.height };
+        var line3Q2_2 = { x: line1Intersection.x + this.verticalRoadParam.width + space, y: line1Intersection.y + this.horizontalRoadParam.height };
 
-        this.verticalRoadParam.streetLine3 = "M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y - space) + " Q " + (line1Intersection.x + verticalRoadObject.width) + "," + line1Intersection.y + " " + (line1Intersection.x + verticalRoadObject.width + space) + ",0  M" + line3MQ2.x + "," + line3MQ2.y + " Q " + line3Q2_1.x + "," + line3Q2_1.y + " " + line3Q2_2.x + "," + line3Q2_2.y + "  M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y + roadObject.height + space) + " L" + (this.verticalRoadCoordinates.endPoint.x + verticalRoadObject.width) + "," + this.verticalRoadCoordinates.endPoint.y;
+        this.verticalRoadParam.streetLine3 = "M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + (line1Intersection.y - space) + " Q " + (line1Intersection.x + this.verticalRoadParam.width) + "," + line1Intersection.y + " " + (line1Intersection.x + this.verticalRoadParam.width + space) + ",0  M" + line3MQ2.x + "," + line3MQ2.y + " Q " + line3Q2_1.x + "," + line3Q2_1.y + " " + line3Q2_2.x + "," + line3Q2_2.y + "  M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " L" + (this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width) + "," + this.verticalRoadCoordinates.endPoint.y;
 
-        this.coordinatePath.streetLine1 = "M0,0 L" + (line1Intersection.x - space) + ",0 M" + (line1Intersection.x + verticalRoadObject.width + space) + ",0 L" + roadObject.width + ",0";
+        this.coordinatePath.streetLine1 = "M0,0 L" + (line1Intersection.x - space) + ",0 M" + (line1Intersection.x + this.verticalRoadParam.width + space) + ",0 L" + this.horizontalRoadParam.width + ",0";
 
-        this.coordinatePath.streetLine2 = "M0," + roadObject.height / 2 + " L" + (line1Intersection.x - space) + "," + roadObject.height / 2 + " M" + (line1Intersection.x + verticalRoadObject.width + space) + "," + roadObject.height / 2 + " L" + roadObject.width + "," + roadObject.height / 2;
+        this.coordinatePath.streetLine2 = "M0," + this.horizontalRoadParam.height / 2 + " L" + (line1Intersection.x - space) + "," + this.horizontalRoadParam.height / 2 + " M" + (line1Intersection.x + this.verticalRoadParam.width + space) + "," + this.horizontalRoadParam.height / 2 + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height / 2;
 
-        this.coordinatePath.streetLine3 = "M0," + roadObject.height + " L" + (line1Intersection.x - space) + "," + roadObject.height + " M" + (line1Intersection.x + verticalRoadObject.width + space) + "," + roadObject.height + " L" + roadObject.width + "," + roadObject.height;
+        this.coordinatePath.streetLine3 = "M0," + this.horizontalRoadParam.height + " L" + (line1Intersection.x - space) + "," + this.horizontalRoadParam.height + " M" + (line1Intersection.x + this.verticalRoadParam.width + space) + "," + this.horizontalRoadParam.height + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height;
 
-        this.verticalRoadParam.line3Point2M1 = { x: line3MQ2.x - this.commonParam.square.width / 2, y: line3MQ2.y - this.commonParam.square.height};
-        this.verticalRoadParam.line3Point2M2 = { x: line3Q2_2.x - this.commonParam.square.width, y: line3Q2_2.y - this.commonParam.square.height / 2 };
+        this.verticalRoadParam.line3Point2M1.x = line3MQ2.x - this.commonParam.square.width / 2;
+        this.verticalRoadParam.line3Point2M1.y = line3MQ2.y - this.commonParam.square.height;
+        this.verticalRoadParam.line3Point2M2.x = line3Q2_2.x - this.commonParam.square.width;
+        this.verticalRoadParam.line3Point2M2.y = line3Q2_2.y - this.commonParam.square.height / 2 ;
         this.verticalRoadParam.line3Point2M3 = { x: line3MQ2.x + (line3Q2_2.x - line3MQ2.x) / 2 - this.commonParam.square.width / 2, y: line3Q2_2.y + (line3MQ2.y - line3Q2_2.y) / 2 - this.commonParam.square.height };
 
         this.verticalRoadParam.line3Point2LPath = "M" + (this.verticalRoadParam.line3Point2M1.x + this.commonParam.square.width) + "," + this.verticalRoadParam.line3Point2M1.y + " L" + (this.verticalRoadParam.line3Point2M3.x) + "," + (this.verticalRoadParam.line3Point2M3.y + this.commonParam.square.height) + " M" + (this.verticalRoadParam.line3Point2M3.x + this.commonParam.square.width) + "," + this.verticalRoadParam.line3Point2M3.y + " L" + (this.verticalRoadParam.line3Point2M2.x) + "," + (this.verticalRoadParam.line3Point2M2.y + this.commonParam.square.height);
@@ -719,113 +720,64 @@ class Road extends React.Component {
        
         this.verticalRoadParam.line3Point2QPath = "M" + line3MQ2.x + ", " + line3MQ2.y + " Q " + line3Q2_1.x + ", " + line3Q2_1.y + " " + line3Q2_2.x + ", " + line3Q2_2.y;
  
-        this.verticalRoadParam.maskLayerPath1 = "M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width / 2) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width / 2) + "," + this.verticalRoadCoordinates.endPoint.y;
+        this.verticalRoadParam.maskLayerPath1 = "M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) + "," + this.verticalRoadCoordinates.endPoint.y;
 
         this.verticalRoadParam.line1Point1Path = this.getTriangle({ x: this.verticalRoadCoordinates.startPoint.x, y: this.verticalRoadCoordinates.startPoint.y + this.commonParam.triangle.width }, "left");
         this.verticalRoadParam.line1Point2Path = this.getTriangle(this.verticalRoadCoordinates.endPoint, "left");
         this.verticalRoadParam.line3Point1Path = this.getTriangle({ x: this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width, y: this.verticalRoadCoordinates.startPoint.y + this.commonParam.triangle.width }, "right");
         this.verticalRoadParam.line3Point2Path = this.getTriangle({ x: this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width, y: this.verticalRoadCoordinates.endPoint.y }, "right");
 
-        this.verticalRoadParam.line2Point1Path = this.getRhombi({ x: this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width / 2, y: this.horizontalRoadParam.height / 2 - this.commonParam.rhombi.halfHeight });
+        this.verticalRoadParam.line2Point1Path = this.getRhombi({ x: this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2, y: this.horizontalRoadParam.height / 2 - this.commonParam.rhombi.halfHeight });
 
-        this.verticalRoadParam.line2Point1 = { x: this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width / 2 - this.commonParam.square.width /2, y: this.verticalRoadCoordinates.startPoint.y - this.commonParam.square.height * 2, transform: "" };
-        this.verticalRoadParam.line2Point2 = { x: this.verticalRoadCoordinates.endPoint.x + verticalRoadObject.width / 2 - this.commonParam.square.width / 2, y: this.verticalRoadCoordinates.endPoint.y + this.commonParam.square.height * 2, transform:"" };
+        this.verticalRoadParam.line2Point1 = { x: this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2 - this.commonParam.square.width /2, y: this.verticalRoadCoordinates.startPoint.y - this.commonParam.square.height * 2, transform: "" };
+        this.verticalRoadParam.line2Point2 = { x: this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width / 2 - this.commonParam.square.width / 2, y: this.verticalRoadCoordinates.endPoint.y + this.commonParam.square.height * 2, transform: "" };
+
+        this.drawVLine3Point2Text(true);
+        this.drawHLine3Point2Text(true);
+
     }
 
     moveToLine3Point2M3() {
 
-        var movePointX = 0;
-        if ((this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) >= this.lastRoadPoint.x) {
-            movePointX = this.props.point.x - this.lastRoadPoint.x - this.verticalRoadParam.width / 2 - this.verticalRoadCoordinates.line3Point2.MQ1XSpace;
-            console.log("func 1");
-        } else {
-           movePointX = this.props.point.x - this.lastRoadPoint.x - this.verticalRoadParam.width / 2 - this.verticalRoadCoordinates.line3Point2.MQ1XSpace + (this.horizontalRoadParam.width / 2 - this.verticalRoadCoordinates.startPoint.x);
+        var movePointX = this.props.point.x - this.lastRoadPoint.x - this.verticalRoadParam.width / 2 - this.verticalRoadCoordinates.line3Point2.MQ1XSpace/2 + (this.horizontalRoadParam.width / 2 - this.verticalRoadCoordinates.startPoint.x - this.verticalRoadParam.width / 2);
 
-             //movePointX = this.props.point.x - this.lastRoadPoint.x - this.verticalRoadParam.line3Point2M3.x - this.horizontalRoadParam.width / 2
-            if (movePointX > 0) {
-                movePointX = movePointX - this.verticalRoadParam.width / 2;
-
-                console.log("func 2");
-            }
-        }
-      
-        var line1Intersection = { x: 0, y: 0 };
-     
         var line3MQ1XSpace = this.verticalRoadCoordinates.line3Point2.MQ1XSpace + movePointX;
         var line3MQ1YSpace = this.verticalRoadCoordinates.line3Point2.MQ1YSpace + movePointX;
         if (line3MQ1YSpace < 0) line3MQ1YSpace = 0;
         if (line3MQ1XSpace < 0) line3MQ1XSpace = 0;
         var moveDistance = line3MQ1YSpace > line3MQ1XSpace ? line3MQ1XSpace : line3MQ1YSpace;
-        var vWidth = this.verticalRoadCoordinates.endPoint.y - (line1Intersection.y + roadObject.height);
-        var hWidth = this.verticalRoadParam.width - line1Intersection.x;
+        var vWidth = this.verticalRoadCoordinates.endPoint.y - this.horizontalRoadParam.height;
+        var hWidth = this.horizontalRoadParam.width - this.verticalRoadCoordinates.endPoint.x - this.verticalRoadParam.width;
         var maxDistance = vWidth > hWidth ? hWidth : vWidth;
         if (moveDistance > maxDistance) moveDistance = maxDistance;
-        console.log("this.props.point.x :" + this.props.point.x+" movePointX: " + movePointX + " moveDistance:" + moveDistance + " maxDistance:" + maxDistance);
-        this.verticalRoadCoordinates.line3Point2.MQ1XSpace = moveDistance;
+        
+        this.verticalRoadCoordinates.line3Point2.MQ1XSpace =  moveDistance;
         this.verticalRoadCoordinates.line3Point2.MQ1YSpace = moveDistance;
-
-        if (this.verticalRoadCoordinates.startPoint.x < roadObject.width) {
-            line1Intersection.x = this.verticalRoadCoordinates.startPoint.x;
-            line1Intersection.y = 0;
-        }
-        var line3MQ2 = { x: this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width, y: line1Intersection.y + roadObject.height + moveDistance };
-        var line3Q2_1 = { x: line1Intersection.x + verticalRoadObject.width, y: line1Intersection.y + roadObject.height };
-        var line3Q2_2 = { x: line1Intersection.x + verticalRoadObject.width + moveDistance, y: line1Intersection.y + roadObject.height };
-
-        this.verticalRoadParam.streetLine3 = "M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y - this.commonParam.distance) + " Q " + (line1Intersection.x + verticalRoadObject.width) + "," + line1Intersection.y + " " + (line1Intersection.x + verticalRoadObject.width + this.commonParam.distance) + ",0  M" + line3MQ2.x + "," + line3MQ2.y + " Q " + line3Q2_1.x + "," + line3Q2_1.y + " " + line3Q2_2.x + "," + line3Q2_2.y + "  M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y + roadObject.height + moveDistance) + " L" + (this.verticalRoadCoordinates.endPoint.x + verticalRoadObject.width) + "," + this.verticalRoadCoordinates.endPoint.y;
-
-
-        this.coordinatePath.streetLine3 = "M0," + roadObject.height + " L" + (line1Intersection.x - this.commonParam.distance) + "," + roadObject.height + " M" + (line1Intersection.x + verticalRoadObject.width + moveDistance) + "," + roadObject.height + " L" + roadObject.width + "," + roadObject.height;
-
-        this.verticalRoadParam.line3Point2M1 = { x: line3MQ2.x - this.commonParam.square.width / 2, y: line3MQ2.y - this.commonParam.square.height/2 };
-        this.verticalRoadParam.line3Point2M2 = { x: line3Q2_2.x - this.commonParam.square.width , y: line3Q2_2.y - this.commonParam.square.height / 2};
-        this.verticalRoadParam.line3Point2M3 = { x: line3MQ2.x + (line3Q2_2.x - line3MQ2.x) / 2 - this.commonParam.square.width, y: line3Q2_2.y + (line3MQ2.y - line3Q2_2.y) / 2 - this.commonParam.square.height/2   };
-
-        this.verticalRoadParam.line3Point2LPath = "M" + (this.verticalRoadParam.line3Point2M1.x + this.commonParam.square.width) + "," + this.verticalRoadParam.line3Point2M1.y + " L" + (this.verticalRoadParam.line3Point2M3.x) + "," + (this.verticalRoadParam.line3Point2M3.y + this.commonParam.square.height) + " M" + (this.verticalRoadParam.line3Point2M3.x + this.commonParam.square.width) + "," + this.verticalRoadParam.line3Point2M3.y + " L" + (this.verticalRoadParam.line3Point2M2.x) + "," + (this.verticalRoadParam.line3Point2M2.y + this.commonParam.square.height);
-        this.verticalRoadParam.line3Point2QPath = "M" + line3MQ2.x + ", " + line3MQ2.y + " Q " + line3Q2_1.x + ", " + line3Q2_1.y + " " + line3Q2_2.x + ", " + line3Q2_2.y;
+        console.log("this.props.point.x: " + this.props.point.x + " moveDistance:" + moveDistance + " MQ1XSpace:" + this.verticalRoadCoordinates.line3Point2.MQ1XSpace + " movePointX:" + movePointX);
+        this.setLine3Point2Path("M3");
         this.drawVLine3Point2Text();
         this.drawHLine3Point2Text();
     }
 
     moveToLine3Point2M1() {
-        var movePointY = this.props.point.y - this.lastRoadPoint.y - roadObject.height / 2 - this.verticalRoadCoordinates.line3Point2.MQ1YSpace;
-        var line1Intersection = { x: 0, y: 0 };
+        var movePointY = this.props.point.y - this.lastRoadPoint.y - this.horizontalRoadParam.height / 2 - this.verticalRoadCoordinates.line3Point2.MQ1YSpace;
 
         var line3MQ1XSpace = this.verticalRoadCoordinates.line3Point2.MQ1XSpace
         var line3MQ1YSpace = this.verticalRoadCoordinates.line3Point2.MQ1YSpace + movePointY;;
 
         if (line3MQ1YSpace < 0) line3MQ1YSpace = 0;
         var moveDistance = line3MQ1YSpace;
-        var maxDistance = this.verticalRoadCoordinates.endPoint.y - (line1Intersection.y + roadObject.height);
+        var maxDistance = this.verticalRoadCoordinates.endPoint.y -  roadObject.height;
 
         if (moveDistance > maxDistance) moveDistance = maxDistance;
 
         this.verticalRoadCoordinates.line3Point2.MQ1YSpace = moveDistance;
 
-        if (this.verticalRoadCoordinates.startPoint.x < roadObject.width) {
-            line1Intersection.x = this.verticalRoadCoordinates.startPoint.x;
-            line1Intersection.y = 0;
-        }
-        var line3MQ2 = { x: this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width, y: line1Intersection.y + roadObject.height + moveDistance };
-        var line3Q2_1 = { x: line1Intersection.x + verticalRoadObject.width, y: line1Intersection.y + roadObject.height };
-        var line3Q2_2 = { x: line1Intersection.x + verticalRoadObject.width + this.verticalRoadCoordinates.line3Point2.MQ1XSpace, y: line1Intersection.y + roadObject.height };
- 
-        this.verticalRoadParam.streetLine3 = "M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y - this.commonParam.distance) + " Q " + (line1Intersection.x + verticalRoadObject.width) + "," + line1Intersection.y + " " + (line1Intersection.x + verticalRoadObject.width + this.commonParam.distance) + ",0  M" + line3MQ2.x + "," + line3MQ2.y + " Q " + line3Q2_1.x + "," + line3Q2_1.y + " " + line3Q2_2.x + "," + line3Q2_2.y + "  M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y + roadObject.height + moveDistance) + " L" + (this.verticalRoadCoordinates.endPoint.x + verticalRoadObject.width) + "," + this.verticalRoadCoordinates.endPoint.y;
-
-
-        this.coordinatePath.streetLine3 = "M0," + roadObject.height + " L" + (line1Intersection.x - this.commonParam.distance) + "," + roadObject.height + " M" + (line1Intersection.x + verticalRoadObject.width + this.verticalRoadCoordinates.line3Point2.MQ1XSpace) + "," + roadObject.height + " L" + roadObject.width + "," + roadObject.height;
-
-        this.verticalRoadParam.line3Point2M1 = { x: line3MQ2.x - this.commonParam.square.width / 2, y: line3MQ2.y - this.commonParam.square.height / 2 };
-        this.verticalRoadParam.line3Point2M2 = { x: line3Q2_2.x - this.commonParam.square.width /2, y: line3Q2_2.y - this.commonParam.square.height / 2 };
-        this.verticalRoadParam.line3Point2M3 = { x: line3MQ2.x + (line3Q2_2.x - line3MQ2.x) / 2 - this.commonParam.square.width/2, y: line3Q2_2.y + (line3MQ2.y - line3Q2_2.y) / 2 - this.commonParam.square.height/2 };
-
-        this.verticalRoadParam.line3Point2LPath = "M" + (this.verticalRoadParam.line3Point2M1.x + this.commonParam.square.width - 5) + "," + this.verticalRoadParam.line3Point2M1.y + " L" + (this.verticalRoadParam.line3Point2M3.x + 5) + "," + (this.verticalRoadParam.line3Point2M3.y + this.commonParam.square.height) + " M" + (this.verticalRoadParam.line3Point2M3.x + this.commonParam.square.width - 3) + "," + this.verticalRoadParam.line3Point2M3.y + " L" + (this.verticalRoadParam.line3Point2M2.x + 5) + "," + (this.verticalRoadParam.line3Point2M2.y + this.commonParam.square.height);
-
-        this.verticalRoadParam.line3Point2QPath = "M" + line3MQ2.x + ", " + line3MQ2.y + " Q " + line3Q2_1.x + ", " + line3Q2_1.y + " " + line3Q2_2.x + ", " + line3Q2_2.y;
+        this.setLine3Point2Path("M1");
         this.drawVLine3Point2Text();
         this.drawHLine3Point2Text();
     }
-
+    
     moveToLine3Point2M2() {
 
         var movePointX = 0;
@@ -834,7 +786,6 @@ class Road extends React.Component {
         } else {
             movePointX = this.props.point.x - this.lastRoadPoint.x - this.verticalRoadParam.width / 2 - this.verticalRoadCoordinates.line3Point2.MQ1XSpace + (this.horizontalRoadParam.width / 2 - this.verticalRoadCoordinates.startPoint.x - this.verticalRoadParam.width / 2);
         }
-        console.log("x:" + this.props.point.x + " last x :" + this.lastRoadPoint.x + " o x:" + this.verticalRoadCoordinates.line3Point2.MQ1XSpace  +" m x:" + movePointX );
         
         var line1Intersection = { x: 0, y: 0 };
       
@@ -846,33 +797,10 @@ class Road extends React.Component {
 
         if (moveDistance > maxDistance) moveDistance = maxDistance;
         this.verticalRoadCoordinates.line3Point2.MQ1XSpace = moveDistance;
-  
-        if (this.verticalRoadCoordinates.startPoint.x < roadObject.width) {
-            line1Intersection.x = this.verticalRoadCoordinates.startPoint.x;
-            line1Intersection.y = 0;
-        }
-        var line3MQ2 = { x: this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width, y: line1Intersection.y + roadObject.height + this.verticalRoadCoordinates.line3Point2.MQ1YSpace };
-        var line3Q2_1 = { x: line1Intersection.x + verticalRoadObject.width, y: line1Intersection.y + roadObject.height };
-        var line3Q2_2 = { x: line1Intersection.x + verticalRoadObject.width + this.verticalRoadCoordinates.line3Point2.MQ1XSpace, y: line1Intersection.y + roadObject.height };
 
-        this.verticalRoadParam.streetLine3 = "M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y - this.commonParam.distance) + " Q " + (line1Intersection.x + verticalRoadObject.width) + "," + line1Intersection.y + " " + (line1Intersection.x + verticalRoadObject.width + this.commonParam.distance) + ",0  M" + line3MQ2.x + "," + line3MQ2.y + " Q " + line3Q2_1.x + "," + line3Q2_1.y + " " + line3Q2_2.x + "," + line3Q2_2.y + "  M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y + roadObject.height + this.verticalRoadCoordinates.line3Point2.MQ1YSpace) + " L" + (this.verticalRoadCoordinates.endPoint.x + verticalRoadObject.width) + "," + this.verticalRoadCoordinates.endPoint.y;
-
-
-        this.coordinatePath.streetLine3 = "M0," + roadObject.height + " L" + (line1Intersection.x - this.commonParam.distance) + "," + roadObject.height + " M" + (line1Intersection.x + verticalRoadObject.width + (this.verticalRoadCoordinates.line3Point2.MQ1XSpace < 6 ? 6 : this.verticalRoadCoordinates.line3Point2.MQ1XSpace) ) + "," + roadObject.height + " L" + roadObject.width + "," + roadObject.height;
-
-        this.verticalRoadParam.line3Point2M1 = { x: line3MQ2.x - this.commonParam.square.width / 2, y: line3MQ2.y - this.commonParam.square.height/2 };
-        this.verticalRoadParam.line3Point2M2 = { x: line3Q2_2.x - this.commonParam.square.width + this.commonParam.square.width / 2, y: line3Q2_2.y - this.commonParam.square.height / 2 };
-        this.verticalRoadParam.line3Point2M3 = { x: line3MQ2.x + (line3Q2_2.x - line3MQ2.x) / 2 - this.commonParam.square.width /2 , y: line3Q2_2.y + (line3MQ2.y - line3Q2_2.y) / 2 - this.commonParam.square.height/2};
-
-        this.verticalRoadParam.line3Point2LPath = "M" + (this.verticalRoadParam.line3Point2M1.x + this.commonParam.square.width / 2) + "," + this.verticalRoadParam.line3Point2M1.y + " L" + (this.verticalRoadParam.line3Point2M3.x + 5) + "," + (this.verticalRoadParam.line3Point2M3.y + this.commonParam.square.height) + " M" + (this.verticalRoadParam.line3Point2M3.x + this.commonParam.square.width / 2) + "," + this.verticalRoadParam.line3Point2M3.y + " L" + (this.verticalRoadParam.line3Point2M2.x + this.commonParam.square.height/2) + "," + (this.verticalRoadParam.line3Point2M2.y + this.commonParam.square.height);
-
-        this.verticalRoadParam.line3Point2QPath = "M" + line3MQ2.x + ", " + line3MQ2.y + " Q " + line3Q2_1.x + ", " + line3Q2_1.y + " " + line3Q2_2.x + ", " + line3Q2_2.y;
+        this.setLine3Point2Path("M2");
         this.drawVLine3Point2Text();
         this.drawHLine3Point2Text();
-    }
-
-    selectedPaved1 = (event) => {
-       // this.verticalRoadParam.maskLayerPath1 = "M" + (roadObject.width / 2) + "," + (-roadObject.width / 2 + roadObject.height / 2) + " L" + (roadObject.width / 2) + "," + (roadObject.width / 2 + roadObject.height / 2);
     }
 
     //-------------DRAWING WHEN MOVING DEFINE END--------------
@@ -991,13 +919,75 @@ class Road extends React.Component {
 
         return { x: midMovePointY < 0 ? Math.abs(a - a1) : x, y: y };
     }
+
+    // Set line3 of vertical road  and line3 of horizontal road intersection square's path
+    setLine3Point2Path(pointName) {
+        var line1Intersection = { x: 0, y: 0 };
+        if (this.verticalRoadCoordinates.startPoint.x < this.horizontalRoadParam.width) {
+            line1Intersection.x = this.verticalRoadCoordinates.startPoint.x;
+            line1Intersection.y = 0;
+        }
+        var line3MQ2 = { x: this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width, y: line1Intersection.y + this.horizontalRoadParam.height + this.verticalRoadCoordinates.line3Point2.MQ1YSpace };
+        var line3Q2_1 = { x: line1Intersection.x + this.verticalRoadParam.width, y: line1Intersection.y + this.horizontalRoadParam.height };
+        var line3Q2_2 = { x: line1Intersection.x + this.verticalRoadParam.width + this.verticalRoadCoordinates.line3Point2.MQ1XSpace, y: line1Intersection.y + this.horizontalRoadParam.height };
+
+        if (pointName == "M3") {//  line3 of vertical road and line3 of horizontal road 's middle square
+            this.verticalRoadParam.streetLine3 = "M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + (line1Intersection.y - this.commonParam.distance) + " Q " + (line1Intersection.x + this.verticalRoadParam.width) + "," + line1Intersection.y + " " + (line1Intersection.x + this.verticalRoadParam.width + this.commonParam.distance) + ",0  M" + line3MQ2.x + "," + line3MQ2.y + " Q " + line3Q2_1.x + "," + line3Q2_1.y + " " + line3Q2_2.x + "," + line3Q2_2.y + "  M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + (line1Intersection.y + this.horizontalRoadParam.height + this.verticalRoadCoordinates.line3Point2.MQ1YSpace) + " L" + (this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width) + "," + this.verticalRoadCoordinates.endPoint.y;
+
+            this.coordinatePath.streetLine3 = "M0," + this.horizontalRoadParam.height + " L" + (line1Intersection.x - this.commonParam.distance) + "," + this.horizontalRoadParam.height + " M" + (line1Intersection.x + this.verticalRoadParam.width + (this.verticalRoadCoordinates.line3Point2.MQ1XSpace < (this.commonParam.square.width / 2) ? (this.commonParam.square.width / 2) : this.verticalRoadCoordinates.line3Point2.MQ1XSpace)) + "," + this.horizontalRoadParam.height + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height;
+
+        } else if (pointName == "M1") {// line3 of vertical road 's square
+            this.verticalRoadParam.streetLine3 = "M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + (line1Intersection.y - this.commonParam.distance) + " Q " + (line1Intersection.x + this.verticalRoadParam.width) + "," + line1Intersection.y + " " + (line1Intersection.x + this.verticalRoadParam.width + this.commonParam.distance) + ",0  M" + line3MQ2.x + "," + line3MQ2.y + " Q " + line3Q2_1.x + "," + line3Q2_1.y + " " + line3Q2_2.x + "," + line3Q2_2.y + "  M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + (line1Intersection.y + this.horizontalRoadParam.height + this.verticalRoadCoordinates.line3Point2.MQ1YSpace) + " L" + (this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width) + "," + this.verticalRoadCoordinates.endPoint.y;
+
+            this.coordinatePath.streetLine3 = "M0," + this.horizontalRoadParam.height + " L" + (line1Intersection.x - this.commonParam.distance) + "," + this.horizontalRoadParam.height + " M" + (line1Intersection.x + this.verticalRoadParam.width + this.verticalRoadCoordinates.line3Point2.MQ1XSpace) + "," + this.horizontalRoadParam.height + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height;
+        }
+        else if (pointName == "M2") {// line3 of horizontal road 's square
+            this.verticalRoadParam.streetLine3 = "M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width) + "," + (line1Intersection.y - this.commonParam.distance) + " Q " + (line1Intersection.x + this.verticalRoadParam.width) + "," + line1Intersection.y + " " + (line1Intersection.x + verticalRoadObject.width + this.commonParam.distance) + ",0  M" + line3MQ2.x + "," + line3MQ2.y + " Q " + line3Q2_1.x + "," + line3Q2_1.y + " " + line3Q2_2.x + "," + line3Q2_2.y + "  M" + (this.verticalRoadCoordinates.startPoint.x + verticalRoadObject.width) + "," + (line1Intersection.y + this.horizontalRoadParam.height + this.verticalRoadCoordinates.line3Point2.MQ1YSpace) + " L" + (this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width) + "," + this.verticalRoadCoordinates.endPoint.y;
+
+
+            this.coordinatePath.streetLine3 = "M0," + this.horizontalRoadParam.height + " L" + (line1Intersection.x - this.commonParam.distance) + "," + this.horizontalRoadParam.height + " M" + (line1Intersection.x + this.verticalRoadParam.width + (this.verticalRoadCoordinates.line3Point2.MQ1XSpace < this.commonParam.square.width / 2 ? this.commonParam.square.width / 2 : this.verticalRoadCoordinates.line3Point2.MQ1XSpace)) + "," + this.horizontalRoadParam.height + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height;
+        }
+
+        this.verticalRoadParam.line3Point2M1.x = line3MQ2.x - this.commonParam.square.width / 2;
+        this.verticalRoadParam.line3Point2M1.y = line3MQ2.y - this.commonParam.square.height / 2;
+        this.verticalRoadParam.line3Point2M2.x = line3Q2_2.x - this.commonParam.square.width;
+        this.verticalRoadParam.line3Point2M2.y = line3Q2_2.y - this.commonParam.square.height / 2;
+        this.verticalRoadParam.line3Point2M3 = { x: line3MQ2.x + (line3Q2_2.x - line3MQ2.x) / 2 - this.commonParam.square.width, y: line3Q2_2.y + (line3MQ2.y - line3Q2_2.y) / 2 - this.commonParam.square.height / 2 };
+
+        if (this.verticalRoadCoordinates.line3Point2.MQ1XSpace < this.commonParam.minShowSymbolDistance && this.verticalRoadCoordinates.line3Point2.MQ1YSpace < this.commonParam.minShowSymbolDistance) {
+
+            this.verticalRoadParam.line3Point2LPath = "";
+            this.verticalRoadParam.line3Point2M1 = { x: line3MQ2.x - this.commonParam.square.width / 2, y: line3MQ2.y - this.commonParam.square.height / 2, width: 0, height: 0 };
+            this.verticalRoadParam.line3Point2M2 = { x: line3Q2_2.x - this.commonParam.square.width, y: line3Q2_2.y - this.commonParam.square.height / 2, width: 0, height: 0 };
+
+
+        } else {
+
+            this.verticalRoadParam.line3Point2M1 = { x: line3MQ2.x - this.commonParam.square.width / 2, y: line3MQ2.y - this.commonParam.square.height / 2, width: this.commonParam.square.width, height: this.commonParam.square.height };
+
+            this.verticalRoadParam.line3Point2M2.width = this.commonParam.square.width;
+            this.verticalRoadParam.line3Point2M2.height = this.commonParam.square.height;
+
+            this.verticalRoadParam.line3Point2LPath = "M" + (this.verticalRoadParam.line3Point2M1.x + this.commonParam.square.width) + "," + this.verticalRoadParam.line3Point2M1.y + " L" + (this.verticalRoadParam.line3Point2M2.x) + "," + (this.verticalRoadParam.line3Point2M2.y + this.commonParam.square.height);
+        }
+
+        if (this.verticalRoadCoordinates.line3Point2.MQ1XSpace < this.commonParam.square.width || this.verticalRoadCoordinates.line3Point2.MQ1YSpace < this.commonParam.square.height) {
+            this.verticalRoadParam.line3Point2LPath = "";
+        }
+        if (this.verticalRoadCoordinates.line3Point2.MQ1XSpace < this.commonParam.square.width / 2) {
+
+            this.verticalRoadParam.line3Point2M2.x = this.verticalRoadParam.line3Point2M2.x + this.commonParam.square.width / 2;
+            this.verticalRoadParam.line3Point2M3.x = this.verticalRoadParam.line3Point2M3.x + this.commonParam.square.width / 2;
+        }
+
+
+        this.verticalRoadParam.line3Point2QPath = "M" + line3MQ2.x + ", " + line3MQ2.y + " Q " + line3Q2_1.x + ", " + line3Q2_1.y + " " + line3Q2_2.x + ", " + line3Q2_2.y;
+    }
     //-------------GET POINTS OR PATHS DEFINE END--------------
 
   
     render() {
         this.renderRoad();
-
-       // $('#console').text("svgroot height:" + $("#svgroot").height() + ",body: width" + $('body').width() + ", height" + $('body').height());
 
         return (
             <g transform={this.coordinatePath.transform}  >
@@ -1010,7 +1000,7 @@ class Road extends React.Component {
                     </marker>
                 </defs>
 
-                <g id="mainpaved1" onClick={this.selectedPaved1} className="display-none">
+                <g id="mainpaved1" className="display-none">
                     <g fill="#FFFFFF" fillOpacity="1.0" fillRule="evenodd" stroke="#000000" strokeWidth="1" strokeOpacity="1.0" strokeLinecap="round" strokeLinejoin="round" textAnchor="middle" fontWeight="normal">
                         <g strokeWidth="1" >
                             <g>
@@ -1034,7 +1024,7 @@ class Road extends React.Component {
                             </g>
                         </g>
                     </g>
-                    <g id="paved1MaskLayer" stroke="lime" strokeWidth="2" strokeDasharray="12 7" strokeOpacity="1" fill="none" onMouseDown ={this.readyVerticalRoadMove}>
+                    <g id="paved1MaskLayer" stroke="lime" strokeWidth="2" strokeDasharray="12 7" strokeOpacity="1" fill="none" onMouseDown={this.readyVerticalRoadMove} onTouchStart={this.readyVerticalRoadMove}>
                         <path d={this.verticalRoadParam.maskLayerPath1} strokeWidth={this.verticalRoadParam.maskLayerStrokeWidth} strokeOpacity="1" strokeLinecap="butt" strokeDasharray="none" stroke="#808080"></path>
                         <path d={this.verticalRoadParam.maskLayerPath1}></path>
                         <path d={this.verticalRoadParam.maskLayerPath1} fill="none" strokeLinecap="butt"></path>
@@ -1071,14 +1061,13 @@ class Road extends React.Component {
                     </g>
                     */}
                     <g stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime">
-                        <rect x={this.verticalRoadParam.line3Point2M1.x} y={this.verticalRoadParam.line3Point2M1.y} width={this.commonParam.square.width} height={this.commonParam.square.height} cursor="crosshair" onMouseDown={this.readyline3Point2M1Move}></rect>
-                        <rect x={this.verticalRoadParam.line3Point2M2.x} y={this.verticalRoadParam.line3Point2M2.y} width={this.commonParam.square.width} height={this.commonParam.square.height} cursor="crosshair" onMouseDown={this.readyline3Point2M2Move}></rect>
-                        <rect x={this.verticalRoadParam.line3Point2M3.x} y={this.verticalRoadParam.line3Point2M3.y} width={this.commonParam.square.width} height={this.commonParam.square.height} cursor="crosshair" onMouseDown={this.readyline3Point2M3Move}></rect>
+                        <rect x={this.verticalRoadParam.line3Point2M1.x} y={this.verticalRoadParam.line3Point2M1.y} width={this.verticalRoadParam.line3Point2M1.width} height={this.verticalRoadParam.line3Point2M1.height} cursor="crosshair" onMouseDown={this.readyline3Point2M1Move} onTouchStart={this.readyline3Point2M1Move} ></rect>
+                        <rect x={this.verticalRoadParam.line3Point2M2.x} y={this.verticalRoadParam.line3Point2M2.y} width={this.verticalRoadParam.line3Point2M2.width} height={this.verticalRoadParam.line3Point2M2.height} cursor="crosshair" onMouseDown={this.readyline3Point2M2Move} onTouchStart={this.readyline3Point2M2Move}></rect>
+                        <rect x={this.verticalRoadParam.line3Point2M3.x} y={this.verticalRoadParam.line3Point2M3.y} width={this.commonParam.square.width} height={this.commonParam.square.height} cursor="crosshair" onMouseDown={this.readyline3Point2M3Move} onTouchStart={this.readyline3Point2M3Move}></rect>
+                        <g stroke="lime">
                         <path d={this.verticalRoadParam.line3Point2LPath} strokeDasharray="3,3" fill="lime" strokeLinecap="butt"></path>
-
+                        </g>
                         <path d={this.verticalRoadParam.line3Point2QPath} strokeDasharray="3,3" fill="none" stroke="lime" strokeLinecap="butt"></path>
-
-                      
                         <g fill="#0000FF" strokeOpacity="0" strokeWidth="0" transform={this.verticalRoadParam.point2TextV.textRoate} fontSize="13" className="userSelect">
                             <g stroke="blue" strokeWidth="1" strokeOpacity="1">
                                 <path d={this.verticalRoadParam.point2TextV.textLine} ></path>
