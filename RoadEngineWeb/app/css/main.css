@@ -33,7 +33,6 @@
 
 .symbol-item-svg {
     width: 48px;
-    border: 1px solid #808080
 }
 
 .display-none {
@@ -53,7 +52,7 @@
     padding: 0;
     display: flex;
     border: 1px solid #808080;
-    height: 600px
+    height: 1000px;
 }
 .nav-panel {
     flex: 1;
@@ -62,7 +61,7 @@
 }
 .drawing-panel {
     flex: 9;
-    height: 600px
+    height: 1000px
 }
 
 @media only screen and (max-width: 420px) {
@@ -80,7 +79,7 @@
 }
 
 #svgroot {
-    height: 600px;
+    height: 1000px;
     width: 100%;
 }
 

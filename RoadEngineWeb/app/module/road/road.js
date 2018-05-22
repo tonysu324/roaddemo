@@ -244,6 +244,8 @@ class Road extends React.Component {
             },
             line1RightRampPoint: { x: roadObject.width, y: 0 },
             line1RightPoint: { x: roadObject.width, y: 0 },
+            line2RightPointAfterRotate: { x: roadObject.width, y: 0 },
+            line1RightPointAfterRotate: { x: roadObject.width, y: 0 },
             Line2RightRotate: 0,
             rememberRoadLine2RightPointCoordinate: { x: 0, y: 0 },
             reDrawRamp: {
@@ -396,32 +398,27 @@ class Road extends React.Component {
 
     //draw all line,symbol,text path of this road component
     drawRoadPaths() {
+        var fixHeight = this.horizontalRoadParam.height;
+        var fixWidth = this.horizontalRoadParam.width;
 
-        var movePointY = - (this.lastRoadPoint.y - this.props.point.y - this.horizontalRoadParam.height / 2);// Y mouse moving distance
-        var movePointX = (this.props.point.x - this.lastRoadPoint.x);// X mouse moving distance
-
-        if (this.horizontalRoadParam.Line2RightRotate != 0) {
-            var rotateHeight = this.horizontalRoadParam.width * Math.sin(this.horizontalRoadParam.Line2RightRotate * Math.PI / 180);
-            movePointY -= rotateHeight;
-        }
-
-        //console.log('this.coordinatePath.roadCoordinate  x:  ' + this.coordinatePath.roadCoordinate.x + '  y:  '+ this.coordinatePath.roadCoordinate.y)
-
-        var maxY = 0;
-        var minY = -this.horizontalRoadParam.height;// restrict move min, max height
-        if (movePointY > maxY) movePointY = maxY;
-        if (movePointY < minY) movePointY = minY;
+        var movePointY = 0;
+        var movePointX = this.props.point.x - this.coordinatePath.roadCoordinate.x - this.horizontalRoadParam.width / 2;// X mouse moving distance
 
         var minX = -40;
         var maxX = this.horizontalRoadParam.width / 4;// restrict move min, max width
         if (movePointX > maxX) movePointX = maxX;
         if (movePointX < minX) movePointX = minX;
 
-        var fixHeight = this.horizontalRoadParam.height;
-        var fixWidth = this.horizontalRoadParam.width;
-
         if (this.props.movingType == 'Line1Right') {
-            if (!this.isChangeLeftPoint && !this.isChangedCenterPoint) {
+            if (!this.horizontalRoadParam.isMovedCentrePoint) {
+                movePointY = this.getMoveY(this.coordinatePath.roadCoordinate, this.horizontalRoadParam.Line2RightRotate);
+
+                // to do limition
+                var maxY = 0;
+                var minY = -this.horizontalRoadParam.height;// restrict move min, max height
+                if (movePointY > maxY) movePointY = maxY;
+                if (movePointY < minY) movePointY = minY;
+
                 this.rememberLine1Right = true;
                 this.horizontalRoadParam.rightY = movePointY;
 
@@ -460,89 +457,102 @@ class Road extends React.Component {
                     this.coordinatePath.midmidPointPath = this.getRhombi(this.changedCenterPoint);
                 }
             } else {
-                var deg = 90;
-                var increasedR = 0;
-                if (this.horizontalRoadParam.isMovedCentrePoint == true) {
+                if (this.horizontalRoadParam.Line2RightRotate == 0) {
+                    var deg = 90;
+                    var increasedR = 0;
                     var c = this.horizontalRoadParam.height / 2;
-                    var a = Math.abs(this.horizontalRoadParam.line1RightPoint.y - this.horizontalRoadParam.height / 2);
 
-                    deg = Math.asin(a / c) * 180 / Math.PI;
+                    var b = Math.abs(this.horizontalRoadParam.width - this.horizontalRoadParam.line1RightPoint.x);
+                    deg = Math.acos(b / c) * 180 / Math.PI;
 
-                    var bb;
-                    var increasedR;
-                    if (deg < 30) {
-                        if (this.horizontalRoadParam.reDrawRamp.midMovePointY > 0) {
-                            bb = -this.props.movedDistance.x;
+                    if (this.horizontalRoadParam.isInside) {
+                        if (this.horizontalRoadParam.isBigCircle == 1) {
+                            deg = 90 - deg;
                         } else {
-                            bb = this.props.movedDistance.x;
+                            deg = -(90 - Math.abs(deg));
                         }
-                        increasedR = bb / Math.cos(deg * Math.PI / 180);
                     } else {
-                        if (this.horizontalRoadParam.reDrawRamp.midMovePointY > 0) {
-                            bb = -this.props.movedDistance.y;
+                        if (this.horizontalRoadParam.isBigCircle == 1) {
+                            deg = -(90 - Math.abs(deg));
                         } else {
-
-                            bb = this.props.movedDistance.y;
+                            deg = 90 - deg;
                         }
-                        increasedR = bb / Math.sin(deg * Math.PI / 180);
                     }
 
-                    //if (deg < 45) {
-                    //    if (this.horizontalRoadParam.reDrawRamp.midMovePointY > 0) {
-                    //        if (this.horizontalRoadParam.reDrawRamp.isBigCircle == 0) {
-                    //            bb = (this.horizontalRoadParam.line1RightPoint.x + (this.lastRoadPoint.x - roadObject.width / 2)) - this.props.point.x;//X
-                    //        } else {
-                    //            bb = (this.horizontalRoadParam.line1RightPoint.x + (this.lastRoadPoint.x - roadObject.width / 2)) - this.props.point.x;
-                    //        }
-                    //    } else {
-                    //        if (this.horizontalRoadParam.reDrawRamp.isBigCircle == 0) {
-                    //            bb = this.props.point.x - (this.horizontalRoadParam.line1RightPoint.x + (this.lastRoadPoint.x - roadObject.width / 2));
-                    //        } else {
-                    //            bb = this.props.point.x - (this.horizontalRoadParam.line1RightPoint.x + (this.lastRoadPoint.x - roadObject.width / 2));
-                    //        }
-                    //    }
-                    //    increasedR = bb / Math.cos(deg * Math.PI / 180);
-                    //} else {
-                    //    if (this.horizontalRoadParam.reDrawRamp.midMovePointY > 0) {
-                    //        if (this.horizontalRoadParam.reDrawRamp.isBigCircle == 0) {
-                    //            bb = (this.horizontalRoadParam.line1RightPoint.y + (this.lastRoadPoint.y - roadObject.height / 2)) - this.props.point.y;
-                    //        } else {
-                    //            bb = this.props.point.y - (this.horizontalRoadParam.line1RightPoint.y + (this.lastRoadPoint.y - roadObject.height / 2));
-                    //        }
-                    //    } else {
-                    //        if (this.horizontalRoadParam.reDrawRamp.isBigCircle == 0) {
-                    //            bb = (this.horizontalRoadParam.line1RightPoint.y + (this.lastRoadPoint.y - roadObject.height / 2)) - this.props.point.y;
-                    //        } else {
-                    //            bb = this.props.point.y - (this.horizontalRoadParam.line1RightPoint.y + (this.lastRoadPoint.y - roadObject.height / 2));
-                    //        }
-                    //    }
-                    //    increasedR = bb / Math.sin(deg * Math.PI / 180);
-                    //}
+                    movePointY = this.getMoveY({ x: (this.coordinatePath.roadCoordinate.x + this.horizontalRoadParam.width), y: this.coordinatePath.roadCoordinate.y }, deg, this.horizontalRoadParam.isInside, this.horizontalRoadParam.isBigCircle == 1);
 
-                    if (this.rightLine1GotoMax && Math.abs(increasedR) < this.horizontalRoadParam.height) {
-                        increasedR = this.horizontalRoadParam.height - Math.abs(increasedR);
+                    if (this.horizontalRoadParam.isBigCircle == 1) {
+                        if (movePointY > this.horizontalRoadParam.height) {
+                            movePointY = this.horizontalRoadParam.height;
+                        }
+                        if (movePointY < 0) {
+                            movePointY = 0;
+                        } 
+                    } else {
+                        if (movePointY < -this.horizontalRoadParam.height) {
+                            movePointY = -this.horizontalRoadParam.height;
+                        }
+                        if (movePointY > 0) {
+                            movePointY = 0;
+                        }
                     }
 
-                    console.log('   deg:   ' + deg + '   bb:   ' + bb + '   increasedR:    ' + increasedR + '  rightY :  ' + this.horizontalRoadParam.rightY);
-
-                    if (increasedR < -this.horizontalRoadParam.height) {
-                        increasedR = -this.horizontalRoadParam.height;
-                        this.rightLine1GotoMax = false;
-                    }
-                    if (increasedR > this.horizontalRoadParam.height) {
-                        increasedR = this.horizontalRoadParam.height;
-                        this.rightLine1GotoMax = true;
-                    }
-
-                    this.horizontalRoadParam.rightY = -Math.abs(increasedR);
+                    this.horizontalRoadParam.rightY = -Math.abs(movePointY);
 
                     this.reDrawLine1RightMoveRamp(this.horizontalRoadParam.reDrawRamp.midMovePointY, this.horizontalRoadParam.reDrawRamp.deg,
                         this.horizontalRoadParam.reDrawRamp.line1R, this.horizontalRoadParam.reDrawRamp.isBigCircle, this.horizontalRoadParam.reDrawRamp.isInside,
                         this.horizontalRoadParam.reDrawRamp.toward, this.horizontalRoadParam.reDrawRamp.line1LeftPoint, this.horizontalRoadParam.reDrawRamp.line1RightPoint);
+                } else { //todo
+                    var newCenterY = Math.sin(this.horizontalRoadParam.Line2RightRotate * Math.PI / 180) * this.horizontalRoadParam.width + this.horizontalRoadParam.height / 2 + this.coordinatePath.roadCoordinate.y;
+                    var newCenterX = Math.cos(this.horizontalRoadParam.Line2RightRotate * Math.PI / 180) * this.horizontalRoadParam.width + this.coordinatePath.roadCoordinate.x;
 
-                    //if (this.horizontalRoadParam.Line2RightRotate != 0) {
-                    //    this.coordinatePath.midrightPoint.transform = "rotate(" + this.horizontalRoadParam.Line2RightRotate + "," + (this.horizontalRoadParam.width + this.commonParam.square.width * 2) + "," + (this.horizontalRoadParam.height / 2 + this.commonParam.square.height) + ")";
-                    //}
+                    var deg = 0;
+                    var increasedR = 0;
+                    var c = this.horizontalRoadParam.height / 2;
+
+                    var b = Math.abs(this.horizontalRoadParam.width - this.horizontalRoadParam.line1RightPoint.x);
+                    deg = Math.acos(b / c) * 180 / Math.PI;
+
+                    console.log("deg : " + deg);
+
+                    if (this.horizontalRoadParam.isInside) {
+                        if (this.horizontalRoadParam.isBigCircle == 1) {
+                            deg = 90 - deg;
+                        } else {
+                            deg = -(90 - Math.abs(deg));
+                        }
+                    } else {
+                        if (this.horizontalRoadParam.isBigCircle == 1) {
+                            deg = -(90 - Math.abs(deg));
+                        } else {
+                            deg = 90 - deg;
+                        }
+                    }
+                    var newDeg = deg + this.horizontalRoadParam.Line2RightRotate;
+
+                    movePointY = this.getMoveY({ x: newCenterX, y: newCenterY }, newDeg, this.horizontalRoadParam.isInside, this.horizontalRoadParam.isBigCircle == 1);
+
+                    if (this.horizontalRoadParam.isBigCircle == 1) {
+                        if (movePointY > this.horizontalRoadParam.height) {
+                            movePointY = this.horizontalRoadParam.height;
+                        }
+                        if (movePointY < 0) {
+                            movePointY = 0;
+                        }
+                    } else {
+                        if (movePointY < -this.horizontalRoadParam.height) {
+                            movePointY = -this.horizontalRoadParam.height;
+                        }
+                        if (movePointY > 0) {
+                            movePointY = 0;
+                        }
+                    }
+
+                    this.horizontalRoadParam.rightY = -Math.abs(movePointY);
+
+                    this.reDrawLine1RightMoveRamp(this.horizontalRoadParam.reDrawRamp.midMovePointY, this.horizontalRoadParam.reDrawRamp.deg,
+                        this.horizontalRoadParam.reDrawRamp.line1R, this.horizontalRoadParam.reDrawRamp.isBigCircle, this.horizontalRoadParam.reDrawRamp.isInside,
+                        this.horizontalRoadParam.reDrawRamp.toward, this.horizontalRoadParam.reDrawRamp.line1LeftPoint, this.horizontalRoadParam.reDrawRamp.line1RightPoint);
                 }
             }
 
@@ -576,6 +586,42 @@ class Road extends React.Component {
             this.setHideHorizontalRoadPoint();
     }
 
+    getMoveY(roadCoordinate, lineRotateDeg, isInSide, isBigCircle) {
+        var movePointY = 0;
+        if (lineRotateDeg == 0) {
+            movePointY = - (roadCoordinate.y - this.props.point.y);// Y mouse moving distance
+        }
+        else if (lineRotateDeg < 0) {
+            if (!isBigCircle) {
+                var bbb = this.props.point.x - roadCoordinate.x;
+                var aaa = Math.tan(Math.abs(lineRotateDeg) * Math.PI / 180) * bbb;
+                var cccc = roadCoordinate.y + this.horizontalRoadParam.height / 2 - this.props.point.y - aaa;
+                movePointY = -(Math.cos(Math.abs(lineRotateDeg) * Math.PI / 180) * cccc - this.horizontalRoadParam.height / 2);
+            } else {
+                var bbb = roadCoordinate.x - this.props.point.x;                
+                var aaa = Math.tan(Math.abs(lineRotateDeg) * Math.PI / 180) * bbb;
+                var cccc = this.props.point.y - (roadCoordinate.y + this.horizontalRoadParam.height /2) - aaa;
+                movePointY = cccc * Math.cos(Math.abs(lineRotateDeg) * Math.PI / 180) - this.horizontalRoadParam.height / 2;
+            }
+        } else if (lineRotateDeg > 0) {
+            if (!isBigCircle) {
+                var aaa = roadCoordinate.y + this.horizontalRoadParam.height / 2 - this.props.point.y;
+                var ccc = aaa / Math.cos(Math.abs(lineRotateDeg) * Math.PI / 180);
+                var bbb = aaa * Math.tan(Math.abs(lineRotateDeg) * Math.PI / 180);
+                var cccc = this.props.point.x - roadCoordinate.x - bbb;
+                var aaaa = Math.sin(Math.abs(lineRotateDeg) * Math.PI / 180) * cccc;
+                movePointY = -(aaaa + ccc - this.horizontalRoadParam.height / 2);
+            } else {
+                var bbb = this.props.point.x - roadCoordinate.x;
+                var aaa = Math.tan(Math.abs(lineRotateDeg) * Math.PI / 180) * bbb;
+                var cccc = this.props.point.y - aaa - (roadCoordinate.y + this.horizontalRoadParam.height / 2);
+                movePointY = (Math.cos(Math.abs(lineRotateDeg) * Math.PI / 180) * cccc - this.horizontalRoadParam.height / 2);
+            }
+        }
+
+        return movePointY;
+    }
+
     //draw line 1 right text
     drawLine1RightText() {
         var text = (this.horizontalRoadParam.rightY * -1) / 4 + "";
@@ -596,6 +642,7 @@ class Road extends React.Component {
             var line1RightPointY = this.horizontalRoadParam.line1RightPoint.y;
             var space = 6;
 
+            console.log("this.horizontalRoadParam.line1RightPoint.x:" + this.horizontalRoadParam.line1RightPoint.x + " this.horizontalRoadParam.line1RightPoint.y:" + this.horizontalRoadParam.line1RightPoint.y);
             this.coordinatePath.textLine = "M" + (this.horizontalRoadParam.line1RightPoint.x - y) + " ," + line1RightPointY + " L" + this.horizontalRoadParam.line1RightPoint.x + " ," + line1RightPointY + " M" + (this.horizontalRoadParam.line1RightPoint.x - space) + " " + (line1RightPointY - space) + ",L " + this.horizontalRoadParam.line1RightPoint.x + " " + line1RightPointY + " M " + this.horizontalRoadParam.line1RightPoint.x + "," + line1RightPointY + " L " + (this.horizontalRoadParam.line1RightPoint.x - space) + " " + (line1RightPointY + space) + " M" + (this.horizontalRoadParam.line1RightPoint.x - y + space) + "," + (line1RightPointY - space) + ",L " + (this.horizontalRoadParam.line1RightPoint.x - y) + " " + line1RightPointY + " M " + (this.horizontalRoadParam.line1RightPoint.x - y) + "," + line1RightPointY + " L " + (this.horizontalRoadParam.line1RightPoint.x - y + space) + " " + (line1RightPointY + space);
 
 
@@ -739,7 +786,7 @@ class Road extends React.Component {
 
         var currentMousePoint = { x: e.clientX - $(".nav-panel").width(), y: e.clientY };
         var currentRoadCoordinate = { x: this.coordinatePath.roadCoordinate.x, y: this.coordinatePath.roadCoordinate.y };
-        this.horizontalRoadParam.rememberedMoveLine2MidPointY = this.horizontalRoadParam.moveLine2MidPointY;
+       
         this.props.tellParentLine2MidHaveBeenClicked(currentMousePoint, currentRoadCoordinate);
         event.stopPropagation();
         event.preventDefault();
@@ -769,6 +816,8 @@ class Road extends React.Component {
         event.stopPropagation();
         event.preventDefault();
     }
+
+   
     //-------------READY MOVE EVENTS DEFINE END----------------
 
     //-------------DRAWING WHEN MOVING DEFINE------------------
@@ -862,12 +911,11 @@ class Road extends React.Component {
     }
 
     moveToDrawLine2MidControllerPoint() {
-
-        var movePointY = (this.props.point.y - this.coordinatePath.roadCoordinate.y - (this.horizontalRoadParam.height / 2));
+        var movePointY = this.getMoveY(this.coordinatePath.roadCoordinate, this.horizontalRoadParam.Line2RightRotate);
         var midMovePointY = movePointY - this.horizontalRoadParam.height / 2;
 
-        var  toward = midMovePointY > 0 ? 0 : 1;
-
+        this.horizontalRoadParam.moveLine2MidPointY = midMovePointY;
+        var toward = midMovePointY > 0 ? 0 : 1;
         var c = Math.sqrt(Math.pow(this.horizontalRoadParam.width / 2, 2) + Math.pow(midMovePointY, 2));
 
         this.horizontalRoadParam.isMovedCentrePoint = midMovePointY != 0;
@@ -888,9 +936,6 @@ class Road extends React.Component {
         var line1LeftPoint = this.getLine1LeftControllerPoint(midMovePointY, deg, c, 1);
 
         var line1RightPoint = this.getLine1RightControllerPoint(line1LeftPoint, midMovePointY, 1);
-
-        console.log('line1LeftPoint   x: ' + line1LeftPoint.x + '  y:  ' + line1LeftPoint.y + 'line1RightPoint   x:  ' + line1RightPoint.x + '  y:   ' + line1RightPoint.y);
-
         this.coordinatePath.topleftPointPath = this.getTriangle(line1LeftPoint, "up");
         if (this.horizontalRoadParam.rightY != 0) {
             this.coordinatePath.topRightPointPath = this.getTriangle({ x: line1RightPoint.x - 12, y: this.horizontalRoadParam.rightY }, "up");
@@ -934,8 +979,7 @@ class Road extends React.Component {
         this.coordinatePath.bottomleftPointPath = "";
         this.coordinatePath.bottomrightPointPath = "";
 
-        this.coordinatePath.midmidBigPointPath = { x: this.horizontalRoadParam.width / 2, y: movePointY };
-
+        this.coordinatePath.midmidBigPointPath = { x: this.horizontalRoadParam.width / 2, y: (movePointY - this.commonParam.square.height * 0.8) };
         this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
 
         var x = this.horizontalRoadParam.width / 2;
