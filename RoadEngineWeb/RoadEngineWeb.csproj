@@ -89,6 +89,7 @@
     <Content Include="app\js\reactjs\react.production.min.js" />
     <Content Include="app\js\svg.js" />
     <Content Include="app\main\index.html" />
+    <Content Include="app\module\road\mainpanel.js" />
     <Content Include="app\module\road\road.js" />
     <Content Include="app\svg\Paved_1.png" />
     <Content Include="app\svg\Paved_1.svg" />
