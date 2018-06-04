@@ -249,8 +249,10 @@ class Road extends React.Component {
             this.coordinatePath.bottomrightPointPath = this.getTriangle(this.horizontalRoadParam.line3RightRampPoint, "down");
         }
 
-        this.coordinatePath.midleftPoint = { x: -this.commonParam.square.width * 3, y: (this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight), width: this.commonParam.square.width, height: this.commonParam.square.height };
-        this.coordinatePath.midrightPoint = { x: this.horizontalRoadParam.width + this.commonParam.square.width * 2, y: (this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight), transform: "", width: this.commonParam.square.width, height: this.commonParam.square.height };
+        if (!this.horizontalRoadParam.isMovedCentrePoint) {
+            this.coordinatePath.midleftPoint = { x: -this.commonParam.square.width * 3, y: (this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight), width: this.commonParam.square.width, height: this.commonParam.square.height };
+            this.coordinatePath.midrightPoint = { x: this.horizontalRoadParam.width + this.commonParam.square.width * 2, y: (this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight), transform: "", width: this.commonParam.square.width, height: this.commonParam.square.height };
+        }
 
         this.coordinatePath.midmidBigPointPath = { x: this.getHorizontalRoadHalfWidth() - this.commonParam.rhombi.halfHeight, y: this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight }
 
@@ -851,24 +853,10 @@ class Road extends React.Component {
         } else {
             this.horizontalRoadParam.width = movePointX;
         }
-        if (this.horizontalRoadParam.width < roadObject.width) this.horizontalRoadParam.width = roadObject.width;// limit the road min width
-        this.horizontalRoadParam.line1RightPoint.x = this.horizontalRoadParam.width;
-        this.horizontalRoadParam.line3RightPoint.x = this.horizontalRoadParam.width;
-        this.coordinatePath.streetLine1 = "M0,0 L" + this.horizontalRoadParam.width + ",0 ";
-        this.coordinatePath.streetLine2 = this.getLine2Path();
-        this.coordinatePath.streetLine3 = "M0," + this.horizontalRoadParam.height + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height + "";
 
-        this.horizontalRoadParam.maskLayerPaths.Path = "M0," + this.getHorizontalRoadHalfHeight() + " L" + this.horizontalRoadParam.width + "," + this.getHorizontalRoadHalfHeight();
-
-        this.coordinatePath.midmidBigPointPath = { x: this.getHorizontalRoadHalfWidth() - this.commonParam.rhombi.halfHeight, y: this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight }
-        if (!this.horizontalRoadParam.isMovedCentrePoint) {
-            this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
-        } else {
-            this.coordinatePath.midmidPointPath = this.getRhombi(this.horizontalRoadParam.centrePoint);
+        if (this.horizontalRoadParam.width < roadObject.width) {
+            this.horizontalRoadParam.width = roadObject.width;// limit the road min width
         }
-
-        this.getLine1RightRampPath();
-        this.getLine3RightRampPath();
 
         if (!this.horizontalRoadParam.isDrawLine1LeftRamp) {
             this.horizontalRoadParam.isDrawLine1RightRamp = true;
@@ -885,14 +873,10 @@ class Road extends React.Component {
             x: this.horizontalRoadParam.width - this.commonParam.triangle.width,
             y: this.horizontalRoadParam.isDrawLine3RightRamp ? (this.horizontalRoadParam.line3RampMoveY == 0 ? this.horizontalRoadParam.height : this.horizontalRoadParam.line3RampMoveY) : this.horizontalRoadParam.height
         };
-         
+
         this.coordinatePath.topRightPointPath = this.getTriangle(this.horizontalRoadParam.line1RightRampPoint, "up");
-        this.coordinatePath.bottomrightPointPath = this.getTriangle(this.horizontalRoadParam.line3RightRampPoint, "down");         
+        this.coordinatePath.bottomrightPointPath = this.getTriangle(this.horizontalRoadParam.line3RightRampPoint, "down");
 
-        this.drawLine1RightText();
-        this.drawLine3RightText();
-
-        this.horizontalRoadParam.rememberLastWidth = this.horizontalRoadParam.width;
         if (movePointY != 0) {//calculate rotate deg when moving the point
             var a = this.props.point.y - this.coordinatePath.roadCoordinate.y - this.getHorizontalRoadHalfHeight();
             var b = this.props.point.x - this.coordinatePath.roadCoordinate.x;
@@ -905,6 +889,34 @@ class Road extends React.Component {
                 y: this.props.point.y
             };
         }
+
+        if (!this.horizontalRoadParam.isMovedCentrePoint) {
+            this.horizontalRoadParam.line1RightPoint.x = this.horizontalRoadParam.width;
+            this.horizontalRoadParam.line3RightPoint.x = this.horizontalRoadParam.width;
+            this.coordinatePath.streetLine1 = "M0,0 L" + this.horizontalRoadParam.width + ",0 ";
+            this.coordinatePath.streetLine2 = this.getLine2Path();
+            this.coordinatePath.streetLine3 = "M0," + this.horizontalRoadParam.height + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height + "";
+
+            this.horizontalRoadParam.maskLayerPaths.Path = "M0," + this.getHorizontalRoadHalfHeight() + " L" + this.horizontalRoadParam.width + "," + this.getHorizontalRoadHalfHeight();
+
+            this.coordinatePath.midmidBigPointPath = { x: this.getHorizontalRoadHalfWidth() - this.commonParam.rhombi.halfHeight, y: this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight }
+            if (!this.horizontalRoadParam.isMovedCentrePoint) {
+                this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
+            } else {
+                this.coordinatePath.midmidPointPath = this.getRhombi(this.horizontalRoadParam.centrePoint);
+            }
+
+            this.getLine1RightRampPath();
+            this.getLine3RightRampPath();            
+
+            this.drawLine1RightText();
+            this.drawLine3RightText();
+
+            this.horizontalRoadParam.rememberLastWidth = this.horizontalRoadParam.width;
+            
+        } else {
+            this.moveToDrawLine2MidControllerPoint(true);
+        }
     }
 
     moveToDrawByLine2LeftRect() {
@@ -914,56 +926,74 @@ class Road extends React.Component {
 
         this.horizontalRoadParam.width = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2)) - this.commonParam.square.width * 2;
 
+        if (this.horizontalRoadParam.width < roadObject.width) {
+            this.horizontalRoadParam.width = roadObject.width;// limit the road min width
+        }
+
         this.horizontalRoadParam.Line2RightRotate = rotateDeg;// save rotate degree
-        this.horizontalRoadParam.line1RightPoint.x = this.horizontalRoadParam.width;
-        this.horizontalRoadParam.line3RightPoint.x = this.horizontalRoadParam.width;
-
-        this.coordinatePath.streetLine1 = "M0,0 L" + this.horizontalRoadParam.width + ",0 ";
-        this.coordinatePath.streetLine2 = this.getLine2Path();
-        this.coordinatePath.streetLine3 = "M0," + this.horizontalRoadParam.height + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height + "";
-
-        this.horizontalRoadParam.maskLayerPaths.Path = "M0," + this.getHorizontalRoadHalfHeight() + " L" + this.horizontalRoadParam.width + "," + this.getHorizontalRoadHalfHeight();
-
-        this.horizontalRoadParam.line1RightRampPoint.x = this.horizontalRoadParam.width - this.commonParam.triangle.width;
-        if (this.horizontalRoadParam.isDrawLine1RightRamp) {
-            this.horizontalRoadParam.line1RightRampPoint.y = this.horizontalRoadParam.line1RampMoveY;
-        } else {
-            this.horizontalRoadParam.line1RightRampPoint.y = 0;
-        }
-
-        this.horizontalRoadParam.line3RightRampPoint.x = this.horizontalRoadParam.width - this.commonParam.triangle.width;
-        if (this.horizontalRoadParam.isDrawLine3RightRamp) {
-            this.horizontalRoadParam.line3RightRampPoint.y = this.horizontalRoadParam.line3RampMoveY == 0 ? this.horizontalRoadParam.height : this.horizontalRoadParam.line3RampMoveY;
-        } else {
-            this.horizontalRoadParam.line3RightRampPoint.y = this.horizontalRoadParam.height;
-        }
-
-        this.coordinatePath.midmidBigPointPath = { x: this.getHorizontalRoadHalfWidth() - this.commonParam.rhombi.halfHeight, y: this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight };
-        if (!this.horizontalRoadParam.isMovedCentrePoint) {//is moved centre point
-            this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
-        } else {
-            this.coordinatePath.midmidPointPath = this.getRhombi(this.horizontalRoadParam.centrePoint);
-        }
-
-        this.getLine1RightRampPath();
-        this.getLine3RightRampPath();
-
-        this.coordinatePath.topRightPointPath = this.getTriangle(this.horizontalRoadParam.line1RightRampPoint, "up");
-        this.coordinatePath.bottomrightPointPath = this.getTriangle(this.horizontalRoadParam.line3RightRampPoint, "down");
-        this.drawLine1RightText();
-        this.drawLine3RightText();
 
         this.coordinatePath.roadCoordinate.x = this.props.point.x + this.commonParam.square.width * 2;
         this.coordinatePath.roadCoordinate.y = this.props.point.y - this.getHorizontalRoadHalfHeight();
 
         this.coordinatePath.transform = "translate(" + this.coordinatePath.roadCoordinate.x + "," + this.coordinatePath.roadCoordinate.y + ") rotate(" + rotateDeg + ", 0," + this.getHorizontalRoadHalfHeight() + ")";
+
+        if (!this.horizontalRoadParam.isDrawLine1LeftRamp) {
+            this.horizontalRoadParam.isDrawLine1RightRamp = true;
+        }
+        this.horizontalRoadParam.line1RightRampPoint = {
+            x: this.horizontalRoadParam.width - this.commonParam.triangle.width,
+            y: this.horizontalRoadParam.isDrawLine1RightRamp ? this.horizontalRoadParam.line1RampMoveY : 0
+        };
+
+        if (!this.horizontalRoadParam.isDrawLine3LeftRamp) {
+            this.horizontalRoadParam.isDrawLine3RightRamp = true;
+        }
+        this.horizontalRoadParam.line3RightRampPoint = {
+            x: this.horizontalRoadParam.width - this.commonParam.triangle.width,
+            y: this.horizontalRoadParam.isDrawLine3RightRamp ? (this.horizontalRoadParam.line3RampMoveY == 0 ? this.horizontalRoadParam.height : this.horizontalRoadParam.line3RampMoveY) : this.horizontalRoadParam.height
+        };
+
+        this.coordinatePath.topRightPointPath = this.getTriangle(this.horizontalRoadParam.line1RightRampPoint, "up");
+        this.coordinatePath.bottomrightPointPath = this.getTriangle(this.horizontalRoadParam.line3RightRampPoint, "down");
+
+        if (!this.horizontalRoadParam.isMovedCentrePoint) {
+            this.horizontalRoadParam.line1RightPoint.x = this.horizontalRoadParam.width;
+            this.horizontalRoadParam.line3RightPoint.x = this.horizontalRoadParam.width;
+
+            this.coordinatePath.streetLine1 = "M0,0 L" + this.horizontalRoadParam.width + ",0 ";
+            this.coordinatePath.streetLine2 = this.getLine2Path();
+            this.coordinatePath.streetLine3 = "M0," + this.horizontalRoadParam.height + " L" + this.horizontalRoadParam.width + "," + this.horizontalRoadParam.height + "";
+
+            this.horizontalRoadParam.maskLayerPaths.Path = "M0," + this.getHorizontalRoadHalfHeight() + " L" + this.horizontalRoadParam.width + "," + this.getHorizontalRoadHalfHeight();            
+
+            this.coordinatePath.midmidBigPointPath = { x: this.getHorizontalRoadHalfWidth() - this.commonParam.rhombi.halfHeight, y: this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight };
+            if (!this.horizontalRoadParam.isMovedCentrePoint) {//is moved centre point
+                this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
+            } else {
+                this.coordinatePath.midmidPointPath = this.getRhombi(this.horizontalRoadParam.centrePoint);
+            }
+
+            this.getLine1RightRampPath();
+            this.getLine3RightRampPath();
+
+            this.drawLine1RightText();
+            this.drawLine3RightText();
+
+        } else {
+
+            this.moveToDrawLine2MidControllerPoint(true);
+        }
     }
 
-    moveToDrawLine2MidControllerPoint() {
+    moveToDrawLine2MidControllerPoint(isReCalculate) {
         //get the top line's point move distance base the road coordinate and the road rotate angle
         var movePointY = this.getLine1MoveY(this.coordinatePath.roadCoordinate, this.horizontalRoadParam.Line2RightRotate);
         var midMovePointY = movePointY - this.getHorizontalRoadHalfHeight();//get the centre point move distance
 
+        if (isReCalculate == true) {
+            midMovePointY = this.horizontalRoadParam.moveLine2MidPointY;
+            movePointY = midMovePointY + this.getHorizontalRoadHalfHeight();
+        }
         this.horizontalRoadParam.moveLine2MidPointY = midMovePointY;
         //isClosewise means draw the ramp's direction, if the centre point is moved up, the direction is clockwise，and if the cener point is moved down, the direction is anticlockwise
         var isClosewise = midMovePointY > 0 ? 0 : 1;
@@ -991,7 +1021,11 @@ class Road extends React.Component {
         //calc the line1's left point after the centre point is moved
         var line1LeftPoint = this.getLine1LeftControllerPoint(midMovePointY, angleOfCentrePoint, centrePointTriangleDistance);
         var line1RightPoint = this.getLine1RightControllerPoint(line1LeftPoint);//calc the line1's right point base on the left point
-        
+
+        //calc the line2's left point after the centre point is moved
+        var line2LeftPoint = this.getLine2LeftControllerPoint(midMovePointY, isBigCircle, this.commonParam.square.width * 3, line1LeftPoint);
+        var line2RightPoint = this.getLine2RightControllerPoint(line2LeftPoint, isBigCircle);
+
         //calc the line3's left point after the centre point is moved
         var line3LeftPoint = { x: line1LeftPoint.x - (line1LeftPoint.x * 2), y: line1LeftPoint.y + (this.getHorizontalRoadHalfHeight() - line1LeftPoint.y) * 2 };
         var line3RightPoint = this.getLine1RightControllerPoint(line3LeftPoint);//calc the line3's right point base on the left point
@@ -1076,11 +1110,17 @@ class Road extends React.Component {
         var rotateMoveY = movePointY / 2 + this.commonParam.square.height * 2;
 
         var rotateDeg = - Math.atan(halfWidth / rotateMoveY) * 180 / Math.PI;// calculate rotate degree
-        this.coordinatePath.midrightPoint.width = this.coordinatePath.midrightPoint.height = 0;
-        this.coordinatePath.midleftPoint.width = this.coordinatePath.midleftPoint.height = 0;
-
+        this.coordinatePath.midleftPoint = {
+            x: line2LeftPoint.x - this.commonParam.square.height / 2, y: line2LeftPoint.y - this.commonParam.square.height / 2
+        };
+        this.coordinatePath.midrightPoint = {
+            x: line2RightPoint.x - this.commonParam.square.height / 2, y: line2RightPoint.y - this.commonParam.square.height / 2
+        };
+        this.coordinatePath.midrightPoint.width = this.coordinatePath.midrightPoint.height = 10;
+        this.coordinatePath.midleftPoint.width = this.coordinatePath.midleftPoint.height = 10;
+        
         //redraw the entire road if the rotate angle is not 0
-        this.coordinatePath.midrightPoint.transform = "rotate(" + rotateDeg + "," + (this.horizontalRoadParam.width + this.commonParam.square.width * 2) + "," + (this.getHorizontalRoadHalfHeight() + this.commonParam.square.height) + ")";
+        //this.coordinatePath.midrightPoint.transform = "rotate(" + rotateDeg + "," + (this.horizontalRoadParam.width + this.commonParam.square.width * 2) + "," + (this.getHorizontalRoadHalfHeight() + this.commonParam.square.height) + ")";
 
         this.setDisplayHorizontalRoadPoint();
         this.drawLine1RightText();//redraw the line1's text (if the line1's left or right point is moved)
@@ -2319,6 +2359,38 @@ class Road extends React.Component {
         return { x: this.horizontalRoadParam.width - line1LeftControllerPoint.x, y: line1LeftControllerPoint.y };
     }
 
+    getLine2LeftControllerPoint(midMovePointY, isBigCircle, centreDistance, line1LeftPoint) {
+        var degOfLeftPoint = Math.acos(Math.abs(line1LeftPoint.x / this.getHorizontalRoadHalfHeight())) * 180 / Math.PI;
+        var degOfCentrePoint = 90 - degOfLeftPoint;
+
+        var pointX = Math.cos(degOfCentrePoint * Math.PI / 180) * centreDistance;
+        var pointY = Math.sin(degOfCentrePoint * Math.PI / 180) * centreDistance;
+
+        if (isBigCircle == 0) {
+            pointX = -pointX;
+        }
+        if (midMovePointY < 0) {
+            pointY = this.getHorizontalRoadHalfHeight() + pointY;
+        } else {
+            pointY = this.getHorizontalRoadHalfHeight() - pointY;
+        }
+
+        return { x: pointX, y: pointY };
+    }
+
+    getLine2RightControllerPoint(line2LeftControllerPoint, isBigCircle) {
+        var pointX = line2LeftControllerPoint.x;
+        var pointY = line2LeftControllerPoint.y;
+        if (isBigCircle == 0) {
+            pointX = this.horizontalRoadParam.width + Math.abs(pointX);
+        } else {
+            pointX = this.horizontalRoadParam.width - Math.abs(pointX);
+        }
+
+        return { x: pointX, y: pointY };
+    }
+    
+
     // Set line3 of vertical road  and line3 of horizontal road intersection square's path
     setLine3Point2Path(pointName) {
         var line1Intersection = { x: 0, y: 0 };
@@ -2387,12 +2459,12 @@ class Road extends React.Component {
         if (this.horizontalRoadParam.isMovedCentrePoint == true) {
             $("#line1RightRampArrow").addClass("display-none");
             $("#line3RightRampArrow").addClass("display-none");
-            $("#midleft").addClass("display-none");
-            $("#midright").addClass("display-none");
+            //$("#midleft").addClass("display-none");
+            //$("#midright").addClass("display-none");
         } else {
             $("#line1RightRampArrow").removeClass("display-none");
             $("#line3RightRampArrow").removeClass("display-none");
-            $("#midright").removeClass("display-none");
+            //$("#midright").removeClass("display-none");
         }
     }
     //-------------GET POINTS OR PATHS DEFINE END--------------
