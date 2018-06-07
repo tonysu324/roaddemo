@@ -171,7 +171,7 @@ class MainPanel extends React.Component {
 
                 {/* The left navigation component panel */}
                 <div className="nav-panel">
-                    <div style={{ margin: 7 }}>
+                    <div className="nav-panel-content">
 
                         <div className="nav" title="Drag and drop the Paved 1 tool on the drawing to add a horizontal street.">
                             <div>

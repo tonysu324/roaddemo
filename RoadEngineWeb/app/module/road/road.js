@@ -10,23 +10,25 @@ class Road extends React.Component {
             reRender: 0
         };
 
+        var isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
+        var scale = isMobile ? 1.5 : 1;
         this.commonParam = {
             distance: 40,
             minShowSymbolDistance: 30,
             triangle: {
-                width: 12,
-                height: 12,
-                halfWidth: 6,
-                halfHeight: 6,
+                width: 12 * scale,
+                height: 12 * scale,
+                halfWidth: 6 * scale,
+                halfHeight: 6 * scale,
             },
             square: {
-                width: 10,
-                height: 10
+                width: 10 * scale,
+                height: 10 * scale
             },
             rhombi: {
-                width: 12,
-                height: 12,
-                halfHeight: 6
+                width: 12 * scale,
+                height: 12 * scale,
+                halfHeight: 6 * scale
             },
         }
 
@@ -254,8 +256,8 @@ class Road extends React.Component {
             this.coordinatePath.midrightPoint = { x: this.horizontalRoadParam.width + this.commonParam.square.width * 2, y: (this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight), transform: "", width: this.commonParam.square.width, height: this.commonParam.square.height };
         }
 
-        this.coordinatePath.midmidBigPointPath = { x: this.getHorizontalRoadHalfWidth() - this.commonParam.rhombi.halfHeight, y: this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight }
-
+        this.coordinatePath.midmidBigPointPath = { x: this.getHorizontalRoadHalfWidth(), y: this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight }
+        
         if (!this.horizontalRoadParam.isMovedCentrePoint) {
             this.coordinatePath.midmidPointPath = this.getRhombi(this.coordinatePath.midmidBigPointPath);
         } else {
@@ -858,6 +860,8 @@ class Road extends React.Component {
             this.horizontalRoadParam.width = roadObject.width;// limit the road min width
         }
 
+        this.lastRoadPoint.x = this.coordinatePath.roadCoordinate.x + this.getHorizontalRoadHalfWidth();
+
         if (!this.horizontalRoadParam.isDrawLine1LeftRamp) {
             this.horizontalRoadParam.isDrawLine1RightRamp = true;
         }
@@ -1076,11 +1080,11 @@ class Road extends React.Component {
         if (midMovePointY != 0) {
             this.horizontalRoadParam.isMovedCentrePoint = true;
             this.horizontalRoadParam.centrePoint.x = this.getHorizontalRoadHalfWidth();
-            this.horizontalRoadParam.centrePoint.y = movePointY;
+            this.horizontalRoadParam.centrePoint.y = movePointY - this.commonParam.rhombi.halfHeight;
         } else {
             this.horizontalRoadParam.isMovedCentrePoint = false;
             this.horizontalRoadParam.centrePoint.x = roadObject.width / 2;
-            this.horizontalRoadParam.centrePoint.y = this.getHorizontalRoadHalfHeight();
+            this.horizontalRoadParam.centrePoint.y = this.getHorizontalRoadHalfHeight() - this.commonParam.rhombi.halfHeight;
         }
 
         //redraw the line1 and line3 is Ramp (if the ramp is already draw)
@@ -1116,8 +1120,8 @@ class Road extends React.Component {
         this.coordinatePath.midrightPoint = {
             x: line2RightPoint.x - this.commonParam.square.height / 2, y: line2RightPoint.y - this.commonParam.square.height / 2
         };
-        this.coordinatePath.midrightPoint.width = this.coordinatePath.midrightPoint.height = 10;
-        this.coordinatePath.midleftPoint.width = this.coordinatePath.midleftPoint.height = 10;
+        this.coordinatePath.midrightPoint.width = this.coordinatePath.midrightPoint.height = this.commonParam.square.width;
+        this.coordinatePath.midleftPoint.width = this.coordinatePath.midleftPoint.height = this.commonParam.square.height;
         
         //redraw the entire road if the rotate angle is not 0
         //this.coordinatePath.midrightPoint.transform = "rotate(" + rotateDeg + "," + (this.horizontalRoadParam.width + this.commonParam.square.width * 2) + "," + (this.getHorizontalRoadHalfHeight() + this.commonParam.square.height) + ")";
@@ -1605,14 +1609,15 @@ class Road extends React.Component {
             line1Intersection.x = this.verticalRoadCoordinates.startPoint.x;
             line1Intersection.y = 0;
         }
+        
         // hide some elements
         this.hideElements();
 
         //draw path
-        this.verticalRoadParam.streetLine1 = "M" + this.verticalRoadCoordinates.startPoint.x + "," + this.verticalRoadCoordinates.startPoint.y + " L" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y - space) + " Q " + line1Intersection.x + "," + line1Intersection.y + " " + (line1Intersection.x - space) + ",0  M" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " Q " + line1Intersection.x + "," + (line1Intersection.y + this.horizontalRoadParam.height) + " " + (line1Intersection.x - space) + "," + (line1Intersection.y + this.horizontalRoadParam.height) + "  M" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " L" + this.verticalRoadCoordinates.endPoint.x + "," + this.verticalRoadCoordinates.endPoint.y;
+        this.verticalRoadParam.streetLine1 = "M" + this.verticalRoadCoordinates.startPoint.x + "," + this.verticalRoadCoordinates.startPoint.y + " L" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y - space) + " Q " + line1Intersection.x + "," + line1Intersection.y + " " + (line1Intersection.x - space) + ",0  M" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " Q " + line1Intersection.x + "," + (line1Intersection.y + this.horizontalRoadParam.height) + " " + (line1Intersection.x - space) + "," + (line1Intersection.y + this.horizontalRoadParam.height) + "  M" + this.verticalRoadCoordinates.startPoint.x + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " L" + this.verticalRoadCoordinates.endPoint.x + "," + this.verticalRoadCoordinates.endPoint.y; 
 
         this.verticalRoadParam.streetLine2 = "M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) + "," + this.verticalRoadCoordinates.startPoint.y + " L" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) + "," + (line1Intersection.y - space) + " M" + (this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2) + "," + (line1Intersection.y + this.horizontalRoadParam.height + space) + " L" + (this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width / 2) + "," + this.verticalRoadCoordinates.endPoint.y;
-        ;
+        
         // calculate vertical road can be moved point coordinate
         var line3MQ2 = { x: this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width, y: line1Intersection.y + this.horizontalRoadParam.height + space };
         var line3Q2_1 = { x: line1Intersection.x + this.verticalRoadParam.width, y: line1Intersection.y + this.horizontalRoadParam.height };
@@ -1646,6 +1651,7 @@ class Road extends React.Component {
         this.verticalRoadParam.line2Point1 = { x: this.verticalRoadCoordinates.startPoint.x + this.verticalRoadParam.width / 2 - this.commonParam.square.width / 2, y: this.verticalRoadCoordinates.startPoint.y - this.commonParam.square.height * 2, transform: "" };
         this.verticalRoadParam.line2Point2 = { x: this.verticalRoadCoordinates.endPoint.x + this.verticalRoadParam.width / 2 - this.commonParam.square.width / 2, y: this.verticalRoadCoordinates.endPoint.y + this.commonParam.square.height * 2, transform: "" };
         this.coordinatePath.streetLine1RampPath = "";
+        this.coordinatePath.streetLine3RampPath = "";
         this.drawVRoadLine3Point2Text(true);
         this.drawHRoadLine3Point2Text(true);
 
@@ -1653,19 +1659,26 @@ class Road extends React.Component {
 
     //vertical road the third line of from left to right and on the third line's intersection's  right and bottom point of horizontal road
     moveToLine3Point2M3() {
-        //calculate distince of moving x
-        var movePointX = this.props.point.x - this.lastRoadPoint.x - this.verticalRoadParam.width / 2 - this.verticalRoadCoordinates.line3Point2.MQ1XSpace / 2 + (this.getHorizontalRoadHalfWidth() - this.verticalRoadCoordinates.startPoint.x - this.verticalRoadParam.width / 2);
+        var moveDistance = 0;
+        var movePointX = 0;
+        if (this.horizontalRoadParam.Line2RightRotate == 0) {
+            //calculate distince of moving x
+            movePointX = this.props.point.x - this.lastRoadPoint.x - this.verticalRoadParam.width / 2 - this.verticalRoadCoordinates.line3Point2.MQ1XSpace / 2 + (this.getHorizontalRoadHalfWidth() - this.verticalRoadCoordinates.startPoint.x - this.verticalRoadParam.width / 2);
+            
+        } else {
+            movePointX = this.props.point.x - this.lastRoadPoint.x - this.verticalRoadParam.width / 2 - this.verticalRoadCoordinates.line3Point2.MQ1XSpace / 2 + (this.getHorizontalRoadHalfWidth() - this.verticalRoadCoordinates.startPoint.x - this.verticalRoadParam.width / 2);
+        }
 
         var line3MQ1XSpace = this.verticalRoadCoordinates.line3Point2.MQ1XSpace + movePointX;
         var line3MQ1YSpace = this.verticalRoadCoordinates.line3Point2.MQ1YSpace + movePointX;
         if (line3MQ1YSpace < 0) line3MQ1YSpace = 0;
         if (line3MQ1XSpace < 0) line3MQ1XSpace = 0;
-        var moveDistance = line3MQ1YSpace > line3MQ1XSpace ? line3MQ1XSpace : line3MQ1YSpace;
+        moveDistance = line3MQ1YSpace > line3MQ1XSpace ? line3MQ1XSpace : line3MQ1YSpace;
+
         var vWidth = this.verticalRoadCoordinates.endPoint.y - this.horizontalRoadParam.height;
         var hWidth = this.horizontalRoadParam.width - this.verticalRoadCoordinates.endPoint.x - this.verticalRoadParam.width;
         var maxDistance = vWidth > hWidth ? hWidth : vWidth;
         if (moveDistance > maxDistance) moveDistance = maxDistance;// limit max distance
-
         this.verticalRoadCoordinates.line3Point2.MQ1XSpace = moveDistance;
         this.verticalRoadCoordinates.line3Point2.MQ1YSpace = moveDistance;
 
@@ -2225,7 +2238,7 @@ class Road extends React.Component {
     }
 
     getRhombi(point) {
-        return "M " + point.x + " " + point.y + " L " + (point.x - 7) + " " + (point.y + 7) + " L " + point.x + " " + (point.y + 13) + " L " + (point.x + 6) + " " + (point.y + 7) + " L " + point.x + " " + point.y;
+        return "M " + point.x + " " + point.y + " L " + (point.x - this.commonParam.rhombi.halfHeight) + " " + (point.y + this.commonParam.rhombi.halfHeight) + " L " + point.x + " " + (point.y + this.commonParam.rhombi.width) + " L " + (point.x + this.commonParam.rhombi.halfHeight) + " " + (point.y + this.commonParam.rhombi.halfHeight) + " L " + point.x + " " + point.y;
     }
 
     getLine2Path() {
@@ -2588,7 +2601,7 @@ class Road extends React.Component {
                         <text x={this.horizontalRoadParam.Line1RampText.x} y={this.horizontalRoadParam.Line1RampText.y} textAnchor="middle" textLength={this.horizontalRoadParam.Line1RampText.textLength}>{this.horizontalRoadParam.Line1RampText.text}</text>
                     </g>
                     <g id="topleft-arrow" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onTouchStart={this.readyMoveLine1Left} onMouseDown={this.readyMoveLine1Left}  >
-                        <path d={this.coordinatePath.topLeftPointPath} cursor="crosshair" ></path>
+                        <path d={this.coordinatePath.topLeftPointPath} transform={this.coordinatePath.topLeftPointRotate} cursor="crosshair" ></path>
                     </g>
                     <g id="topright-arrow" stroke="#000000" strokeWidth="1" strokeOpacity="1" fill="lime" onTouchStart={this.readyMoveLine1Right} onMouseDown={this.readyMoveLine1Right}>
                         <path d={this.coordinatePath.topRightPointPath} cursor="crosshair" ></path>

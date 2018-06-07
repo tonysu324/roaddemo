@@ -5,6 +5,10 @@
     width: 100%;
 }
 
+#main {
+    height: 100%;
+}
+
 .cursor-pointer {
     cursor: pointer
 }
@@ -50,27 +54,41 @@
 .editor-panel {
     position: relative;
     padding: 0;
-    display: flex;
+    /*display: flex;*/
     border: 1px solid #808080;
-    height: 1000px;
+    /*height: auto;*/
+    height: 100%;
 }
 .nav-panel {
-    flex: 1;
+    /*flex: 1;*/
+    float: left;
+    width: 10%;
     border-left: 1px solid #808080;
-    background: #ececec
+    background: #ececec;
+    height: 100%;
+}
+.nav-panel-content{
+    margin:7px;
 }
 .drawing-panel {
-    flex: 9;
-    height: 1000px
+    /*flex: 9;*/
+    float: left;
+    width: 90%;
+    /*height: auto*/
+    height: 100%;
 }
 
-@media only screen and (max-width: 420px) {
+@media only screen and (max-width: 600px) {
     .nav-panel {
-        flex: 2;
+        width: 20%;
+    }
+
+    .nav-panel-content {
+        margin: 0px;
     }
 
     .drawing-panel {
-        flex: 8
+        width: 80%
     }
     .symbol-item-text {
         margin: 0;
@@ -79,7 +97,7 @@
 }
 
 #svgroot {
-    height: 1000px;
+    height: 100%;
     width: 100%;
 }
 
